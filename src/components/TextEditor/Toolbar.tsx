@@ -1,11 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
   Code, Link2, List, ListOrdered, Image, Table, Paperclip,
-  Type, Smile, Undo, Redo, Heading1, Heading2, Heading3, 
-  Quote, Minus, File, ChevronDown
+  Type, Smile, Undo, Redo
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { FontSizePicker } from './FontSizePicker';
@@ -19,23 +18,16 @@ interface ToolbarProps {
     showColorPicker: boolean;
     showFontSizePicker: boolean;
     showEmojiPicker: boolean;
-    showTextStylePicker?: boolean;
-    showParagraphStylePicker?: boolean;
   };
   onColorChange: (color: string) => void;
   onFontSizeChange: (size: string) => void;
   onEmojiSelect: (emoji: string) => void;
-  toggleDropdown: (dropdown: 'color' | 'fontSize' | 'emoji' | 'textStyle' | 'paragraphStyle') => void;
+  toggleDropdown: (dropdown: 'color' | 'fontSize' | 'emoji') => void;
   insertCodeBlock: () => void;
   insertEquation: () => void;
   insertImage: () => void;
   handleAttachment: () => void;
   insertDivider: () => void;
-  applyTextStyle: (style: string) => void;
-  applyParagraphStyle: (style: string) => void;
-  insertTable: (rows: number, cols: number) => void;
-  handleUndo: () => void;
-  handleRedo: () => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -49,40 +41,20 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   insertEquation,
   insertImage,
   handleAttachment,
-  insertDivider,
-  applyTextStyle,
-  applyParagraphStyle,
-  insertTable,
-  handleUndo,
-  handleRedo
+  insertDivider
 }) => {
-  const [showTableDialog, setShowTableDialog] = useState(false);
-  const [tableRows, setTableRows] = useState(2);
-  const [tableCols, setTableCols] = useState(2);
-
   const handleButtonClick = (e: React.MouseEvent, command: string, value: any = null) => {
     e.preventDefault();
     execCommand(command, false, value);
   };
 
-  const handleTableInsert = (e: React.MouseEvent) => {
-    e.preventDefault();
-    insertTable(tableRows, tableCols);
-    setShowTableDialog(false);
-  };
-  
-  // Helper function to prevent events from bubbling up
-  const stopPropagation = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
     <div className="toolbar">
       <div className="toolbar-group">
-        <button className="btn" title="Undo" onClick={handleUndo}>
+        <button className="btn" title="Undo" onClick={(e) => handleButtonClick(e, 'undo')}>
           <Undo size={16} />
         </button>
-        <button className="btn" title="Redo" onClick={handleRedo}>
+        <button className="btn" title="Redo" onClick={(e) => handleButtonClick(e, 'redo')}>
           <Redo size={16} />
         </button>
       </div>
@@ -91,34 +63,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
       <div className="toolbar-group">
         <div className="dropdown">
-          <button 
-            className="dropdown-btn" 
-            title="Text Style" 
-            onClick={() => toggleDropdown('textStyle')}
-          >
-            <Type size={16} />
-            <span className="dropdown-label">Normal text</span>
-            <ChevronDown size={12} className="dropdown-arrow" />
+          <button className="dropdown-btn" title="Text Style">
+            Normal text
+            <span className="arrow">▼</span>
           </button>
-          {editorState.showTextStylePicker && (
-            <div className="dropdown-menu text-style-picker" onClick={stopPropagation}>
-              <div className="dropdown-item" onClick={() => applyTextStyle('normal')}>
-                Normal text
-              </div>
-              <div className="dropdown-item" onClick={() => applyTextStyle('h1')}>
-                <Heading1 size={16} className="mr-2" /> Heading 1
-              </div>
-              <div className="dropdown-item" onClick={() => applyTextStyle('h2')}>
-                <Heading2 size={16} className="mr-2" /> Heading 2
-              </div>
-              <div className="dropdown-item" onClick={() => applyTextStyle('h3')}>
-                <Heading3 size={16} className="mr-2" /> Heading 3
-              </div>
-              <div className="dropdown-item" onClick={() => applyTextStyle('pre')}>
-                <Code size={16} className="mr-2" /> Code
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -126,30 +74,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
       <div className="toolbar-group">
         <div className="dropdown">
-          <button 
-            className="dropdown-btn" 
-            title="Paragraph Style"
-            onClick={() => toggleDropdown('paragraphStyle')}
-          >
+          <button className="dropdown-btn" title="Paragraph Style">
             <List size={16} />
-            <ChevronDown size={12} className="dropdown-arrow" />
+            <span className="arrow">▼</span>
           </button>
-          {editorState.showParagraphStylePicker && (
-            <div className="dropdown-menu paragraph-style-picker" onClick={stopPropagation}>
-              <div className="dropdown-item" onClick={() => applyParagraphStyle('paragraph')}>
-                <File size={16} className="mr-2" /> Paragraph
-              </div>
-              <div className="dropdown-item" onClick={() => applyParagraphStyle('blockquote')}>
-                <Quote size={16} className="mr-2" /> Blockquote
-              </div>
-              <div className="dropdown-item" onClick={() => applyParagraphStyle('ul')}>
-                <List size={16} className="mr-2" /> Bullet List
-              </div>
-              <div className="dropdown-item" onClick={() => applyParagraphStyle('ol')}>
-                <ListOrdered size={16} className="mr-2" /> Numbered List
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -218,53 +146,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <button className="btn" title="Insert Image" onClick={insertImage}>
           <Image size={16} />
         </button>
-        <button 
-          className="btn" 
-          title="Insert Table" 
-          onClick={() => setShowTableDialog(prev => !prev)}
-        >
+        <button className="btn" title="Insert Table" onClick={(e) => {
+          const html = '<table style="width:100%; border-collapse: collapse;"><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr></table><p></p>';
+          execCommand('insertHTML', false, html);
+        }}>
           <Table size={16} />
-          {showTableDialog && (
-            <div className="table-dialog" onClick={stopPropagation}>
-              <div className="table-dialog-header">Insert Table</div>
-              <div className="table-dialog-content">
-                <div className="table-dialog-row">
-                  <label>Rows:</label>
-                  <input 
-                    type="number" 
-                    min="1" 
-                    max="20" 
-                    value={tableRows} 
-                    onChange={(e) => setTableRows(Math.min(20, Math.max(1, parseInt(e.target.value) || 1)))}
-                  />
-                </div>
-                <div className="table-dialog-row">
-                  <label>Columns:</label>
-                  <input 
-                    type="number" 
-                    min="1" 
-                    max="10" 
-                    value={tableCols} 
-                    onChange={(e) => setTableCols(Math.min(10, Math.max(1, parseInt(e.target.value) || 1)))}
-                  />
-                </div>
-                <div className="table-dialog-buttons">
-                  <button 
-                    className="table-dialog-button cancel" 
-                    onClick={() => setShowTableDialog(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    className="table-dialog-button insert" 
-                    onClick={handleTableInsert}
-                  >
-                    Insert
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </button>
         <button className="btn" title="Attach File" onClick={handleAttachment}>
           <Paperclip size={16} />
@@ -281,7 +167,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onClick={() => toggleDropdown('fontSize')}
           >
             <Type size={16} />
-            <ChevronDown size={12} className="dropdown-arrow" />
+            <span className="arrow">▼</span>
           </button>
           {editorState.showFontSizePicker && (
             <FontSizePicker onSelect={onFontSizeChange} />
@@ -298,7 +184,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               className="color-preview" 
               style={{ backgroundColor: editorState.currentColor }} 
             ></span>
-            <ChevronDown size={12} className="dropdown-arrow" />
+            <span className="arrow">▼</span>
           </button>
           {editorState.showColorPicker && (
             <ColorPicker onSelect={onColorChange} />
@@ -332,7 +218,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <span className="quote-icon">"</span>
         </button>
         <button className="btn" title="Divider" onClick={insertDivider}>
-          <Minus size={16} />
+          <span className="divider-icon">—</span>
         </button>
       </div>
     </div>
