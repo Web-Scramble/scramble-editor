@@ -1,5 +1,4 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
@@ -14,6 +13,33 @@ export const TextEditor = () => {
   });
   
   const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        editorState.showColorPicker || 
+        editorState.showFontSizePicker || 
+        editorState.showEmojiPicker
+      ) {
+        const target = event.target as HTMLElement;
+        const isDropdownClick = target.closest('.dropdown');
+        
+        if (!isDropdownClick) {
+          setEditorState(prev => ({
+            ...prev,
+            showColorPicker: false,
+            showFontSizePicker: false,
+            showEmojiPicker: false
+          }));
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [editorState]);
 
   const execCommand = (command: string, showUI = false, value = null) => {
     document.execCommand(command, showUI, value);
@@ -83,6 +109,16 @@ export const TextEditor = () => {
         
         // Clear selection
         selection.removeAllRanges();
+      } else {
+        const codeBlock = document.createElement('div');
+        codeBlock.className = 'code-block animate-in';
+        codeBlock.textContent = '// Code here';
+        
+        range.insertNode(codeBlock);
+        
+        range.selectNodeContents(codeBlock);
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
     }
   };
@@ -91,18 +127,26 @@ export const TextEditor = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-      const selectedText = range.toString() || 'E = mc²';
+      let equationContent = range.toString();
       
       const equation = document.createElement('span');
-      equation.className = 'equation animate-in';
-      equation.textContent = selectedText;
-      equation.contentEditable = 'true';
+      equation.className = 'equation animate-in editing';
+      
+      if (!equationContent) {
+        equationContent = '$\\LaTeX$';
+      } else if (!equationContent.startsWith('$')) {
+        equationContent = `$${equationContent}$`;
+      }
+      
+      equation.textContent = equationContent;
+      equation.setAttribute('data-latex', equationContent);
       
       range.deleteContents();
       range.insertNode(equation);
       
-      // Clear selection
+      range.selectNodeContents(equation);
       selection.removeAllRanges();
+      selection.addRange(range);
     }
   };
 
@@ -191,12 +235,10 @@ export const TextEditor = () => {
       range.deleteContents();
       range.insertNode(hr);
       
-      // Add a paragraph after the divider to continue typing
       const p = document.createElement('p');
       p.appendChild(document.createElement('br'));
       hr.parentNode?.insertBefore(p, hr.nextSibling);
       
-      // Set cursor to the new paragraph
       const newRange = document.createRange();
       newRange.setStart(p, 0);
       selection.removeAllRanges();
