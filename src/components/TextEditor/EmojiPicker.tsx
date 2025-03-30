@@ -5,7 +5,8 @@ import React from 'react';
 const EMOJIS = [
   '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
   '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
-  '👍', '👎', '❤️', '🔥'
+  '👍', '👎', '❤️', '🔥', '👋', '👏', '🙌', '🤝', '👀', '🎉',
+  '✨', '⭐', '🌟', '💯', '💪', '🤔', '🤭', '🤫', '🤨', '😐'
 ];
 
 interface EmojiPickerProps {
@@ -14,16 +15,18 @@ interface EmojiPickerProps {
 
 export const EmojiPicker: React.FC<EmojiPickerProps> = ({ onSelect }) => {
   return (
-    <div className="emoji-picker grid grid-cols-6 gap-2 p-2 bg-white rounded shadow-lg border border-gray-200 max-w-[240px]">
-      {EMOJIS.map((emoji) => (
-        <div
-          key={emoji}
-          className="emoji-option flex items-center justify-center p-1 hover:bg-gray-100 rounded cursor-pointer text-xl"
-          onClick={() => onSelect(emoji)}
-        >
-          {emoji}
-        </div>
-      ))}
+    <div className="emoji-picker bg-white border border-gray-200 rounded shadow-lg p-2 w-64">
+      <div className="emoji-grid grid grid-cols-8 gap-1">
+        {EMOJIS.map((emoji) => (
+          <div
+            key={emoji}
+            className="emoji-option w-7 h-7 flex items-center justify-center cursor-pointer hover:bg-gray-100 rounded"
+            onClick={() => onSelect(emoji)}
+          >
+            {emoji}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
