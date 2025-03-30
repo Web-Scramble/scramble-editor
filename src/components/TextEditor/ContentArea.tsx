@@ -57,6 +57,9 @@ function calculateQuadratic(a, b, c) {
         
         // Setup event listeners for equations
         setupEquationHandlers();
+        
+        // Make the editor editable correctly
+        contentRef.current.setAttribute('contenteditable', 'true');
       }
     }, []);
     
@@ -103,6 +106,16 @@ function calculateQuadratic(a, b, c) {
       }
     };
     
+    // Ensure command execution works properly by capturing keydown events
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      // Add any special key handling if needed
+      // For example, tab inserts a tab character instead of moving focus
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
+      }
+    };
+    
     return (
       <div 
         className="content-area" 
@@ -119,6 +132,7 @@ function calculateQuadratic(a, b, c) {
         suppressContentEditableWarning={true}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
       />
     );
   }

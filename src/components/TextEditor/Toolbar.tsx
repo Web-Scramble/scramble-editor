@@ -21,17 +21,19 @@ interface ToolbarProps {
     showFontSizePicker: boolean;
     showEmojiPicker: boolean;
     showParagraphStyleMenu: boolean;
+    showTextStyleMenu: boolean;
   };
   onColorChange: (color: string) => void;
   onHighlightChange: (color: string) => void;
   onFontSizeChange: (size: number) => void;
   onEmojiSelect: (emoji: string) => void;
-  toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => void;
+  toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle' | 'textStyle', e: React.MouseEvent) => void;
   insertCodeBlock: () => void;
   insertEquation: () => void;
   handleAttachment: () => void;
   insertDivider: () => void;
   onParagraphStyle: (command: string) => void;
+  onTextStyle: (tag: string) => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -46,7 +48,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   insertEquation,
   handleAttachment,
   insertDivider,
-  onParagraphStyle
+  onParagraphStyle,
+  onTextStyle
 }) => {
   const handleButtonClick = (e: React.MouseEvent, command: string, value: any = null) => {
     e.preventDefault();
@@ -71,15 +74,30 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <button 
             className="dropdown-btn" 
             title="Text Style"
-            onClick={(e) => {
-              // This would implement text style functionality
-              // For now we'll just have a placeholder button
-              e.preventDefault();
-            }}
+            onClick={(e) => toggleDropdown('textStyle', e)}
           >
             Normal text
             <span className="arrow">▼</span>
           </button>
+          {editorState.showTextStyleMenu && (
+            <div className="text-style-menu">
+              <div className="text-style-option" onClick={() => onTextStyle('p')}>
+                <p className="m-0">Normal text</p>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('h1')}>
+                <h1 className="m-0 text-xl font-bold">Heading 1</h1>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('h2')}>
+                <h2 className="m-0 text-lg font-bold">Heading 2</h2>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('h3')}>
+                <h3 className="m-0 text-md font-bold">Heading 3</h3>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('pre')}>
+                <pre className="m-0 text-sm">Preformatted</pre>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

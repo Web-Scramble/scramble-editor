@@ -14,6 +14,7 @@ export const TextEditor = () => {
     showFontSizePicker: false,
     showEmojiPicker: false,
     showParagraphStyleMenu: false,
+    showTextStyleMenu: false,
   });
   
   const contentRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,8 @@ export const TextEditor = () => {
         showHighlightPicker: false,
         showFontSizePicker: false,
         showEmojiPicker: false,
-        showParagraphStyleMenu: false
+        showParagraphStyleMenu: false,
+        showTextStyleMenu: false
       }));
     };
 
@@ -44,9 +46,14 @@ export const TextEditor = () => {
 
   const execCommand = (command: string, showUI = false, value: any = null) => {
     document.execCommand(command, showUI, value);
+    
+    // Focus back on the contentEditable after executing command
     if (contentRef.current) {
       contentRef.current.focus();
     }
+    
+    // Log the command for debugging
+    console.log('Executed command:', command, 'with value:', value);
   };
 
   const handleColorChange = (color: string) => {
@@ -75,6 +82,8 @@ export const TextEditor = () => {
       showFontSizePicker: false
     });
     
+    // The fontSize command uses values 1-7, but we want to use pixel values
+    // So we'll use a special approach to set font size
     document.execCommand('fontSize', false, '7');
     const selectedElements = document.querySelectorAll('font[size="7"]');
     selectedElements.forEach(el => {
@@ -94,10 +103,19 @@ export const TextEditor = () => {
       const range = selection.getRangeAt(0);
       range.deleteContents();
       range.insertNode(document.createTextNode(emoji));
+      
+      // Move cursor after emoji
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    
+    if (contentRef.current) {
+      contentRef.current.focus();
     }
   };
 
-  const toggleDropdown = (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => {
+  const toggleDropdown = (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle' | 'textStyle', e: React.MouseEvent) => {
     e.stopPropagation();
     const updatedState = {
       ...editorState,
@@ -106,6 +124,7 @@ export const TextEditor = () => {
       showFontSizePicker: dropdown === 'fontSize' ? !editorState.showFontSizePicker : false,
       showEmojiPicker: dropdown === 'emoji' ? !editorState.showEmojiPicker : false,
       showParagraphStyleMenu: dropdown === 'paragraphStyle' ? !editorState.showParagraphStyleMenu : false,
+      showTextStyleMenu: dropdown === 'textStyle' ? !editorState.showTextStyleMenu : false,
     };
     setEditorState(updatedState);
   };
@@ -123,8 +142,16 @@ export const TextEditor = () => {
       range.deleteContents();
       range.insertNode(codeBlock);
       
+      // Move cursor to the end of the code block
+      range.collapse(false);
+      
       // Clear selection
       selection.removeAllRanges();
+      selection.addRange(range);
+      
+      if (contentRef.current) {
+        contentRef.current.focus();
+      }
     }
   };
 
@@ -169,8 +196,14 @@ export const TextEditor = () => {
         equation.classList.add('equation-rendered');
       });
       
-      // Clear selection
+      // Move cursor after equation
+      range.collapse(false);
       selection.removeAllRanges();
+      selection.addRange(range);
+      
+      if (contentRef.current) {
+        contentRef.current.focus();
+      }
     }
   };
 
@@ -205,6 +238,15 @@ export const TextEditor = () => {
           
           range.deleteContents();
           range.insertNode(attachment);
+          
+          // Move cursor after attachment
+          range.collapse(false);
+          selection.removeAllRanges();
+          selection.addRange(range);
+          
+          if (contentRef.current) {
+            contentRef.current.focus();
+          }
         }
       }
       
@@ -234,6 +276,10 @@ export const TextEditor = () => {
       newRange.setStart(p, 0);
       selection.removeAllRanges();
       selection.addRange(newRange);
+      
+      if (contentRef.current) {
+        contentRef.current.focus();
+      }
     }
   };
 
@@ -242,6 +288,15 @@ export const TextEditor = () => {
     setEditorState({
       ...editorState,
       showParagraphStyleMenu: false
+    });
+  };
+
+  const handleTextStyle = (tag: string) => {
+    // Format the current block with the specified tag
+    execCommand('formatBlock', false, `<${tag}>`);
+    setEditorState({
+      ...editorState,
+      showTextStyleMenu: false
     });
   };
 
@@ -260,6 +315,7 @@ export const TextEditor = () => {
         handleAttachment={handleAttachment}
         insertDivider={insertDivider}
         onParagraphStyle={handleParagraphStyle}
+        onTextStyle={handleTextStyle}
       />
       <ContentArea ref={contentRef} />
     </div>
