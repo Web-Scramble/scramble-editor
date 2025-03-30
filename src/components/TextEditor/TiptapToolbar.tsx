@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Editor } from '@tiptap/react';
 import { 
@@ -84,16 +85,16 @@ export const TiptapToolbar: React.FC<TiptapToolbarProps> = ({
         <button 
           className={`btn`} 
           title="Undo" 
-          onClick={() => editor.chain().focus().undo().run()}
-          disabled={!editor.can().chain().focus().undo().run()}
+          onClick={() => editor.commands.undo()}
+          disabled={!editor.isActive('history') || !editor.commands.undo}
         >
           <Undo size={16} />
         </button>
         <button 
           className={`btn`} 
           title="Redo" 
-          onClick={() => editor.chain().focus().redo().run()}
-          disabled={!editor.can().chain().focus().redo().run()}
+          onClick={() => editor.commands.redo()}
+          disabled={!editor.isActive('history') || !editor.commands.redo}
         >
           <Redo size={16} />
         </button>

@@ -77,7 +77,7 @@ export const TiptapEditor: React.FC = () => {
       }),
       History.configure({
         depth: 100,
-        newGroupDelay: 500
+        newGroupDelay: 500,
       }),
     ],
     content: '<p>Start typing here...</p>',
