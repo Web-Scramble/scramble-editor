@@ -3,9 +3,28 @@
   max-width: 900px;
   background-color: white;
   border-radius: 3px;
-  overflow: hidden;
+  overflow: visible;
   margin: 0 auto;
   box-shadow: none;
+  position: relative;
+}
+
+.floating-toolbar-container {
+  position: fixed;
+  z-index: 1000;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  max-width: 90vw;
+  transition: box-shadow 0.2s ease;
+  overflow: visible;
+}
+
+.floating-toolbar-container:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar {
@@ -15,8 +34,7 @@
   background-color: transparent;
   flex-wrap: wrap;
   gap: 4px;
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 10;
 }
 
@@ -91,6 +109,10 @@
   min-height: calc(100vh - 100px);
   outline: none;
   line-height: 1.6;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 16px;
 }
 
 .content-area:focus {
@@ -475,7 +497,7 @@
     margin: 0 4px;
   }
   
-  .floating-editor-container {
+  .floating-toolbar-container {
     width: 95vw;
     left: 2.5vw !important;
     right: 2.5vw !important;

@@ -1,8 +1,9 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
-import { X, GripVertical } from 'lucide-react';
+import { GripVertical } from 'lucide-react';
 
 export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
@@ -18,10 +19,10 @@ export const TextEditor = () => {
   });
   
   const contentRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   const dragHandleRef = useRef<HTMLDivElement>(null);
   
-  const [position, setPosition] = useState({ x: 100, y: 100 });
+  const [toolbarPosition, setToolbarPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
@@ -55,12 +56,12 @@ export const TextEditor = () => {
       const newX = e.clientX - dragOffset.x;
       const newY = e.clientY - dragOffset.y;
       
-      const editorRect = editorRef.current?.getBoundingClientRect();
-      if (editorRect) {
-        const maxX = window.innerWidth - editorRect.width;
-        const maxY = window.innerHeight - editorRect.height;
+      const toolbarRect = toolbarRef.current?.getBoundingClientRect();
+      if (toolbarRect) {
+        const maxX = window.innerWidth - toolbarRect.width;
+        const maxY = window.innerHeight - toolbarRect.height;
         
-        setPosition({
+        setToolbarPosition({
           x: Math.max(0, Math.min(newX, maxX)),
           y: Math.max(0, Math.min(newY, maxY))
         });
@@ -84,12 +85,12 @@ export const TextEditor = () => {
 
   const handleDragStart = (e: React.MouseEvent) => {
     if (e.target === dragHandleRef.current || (e.target as Element).closest('.drag-handle')) {
-      const editorRect = editorRef.current?.getBoundingClientRect();
-      if (editorRect) {
+      const toolbarRect = toolbarRef.current?.getBoundingClientRect();
+      if (toolbarRect) {
         setIsDragging(true);
         setDragOffset({
-          x: e.clientX - editorRect.left,
-          y: e.clientY - editorRect.top
+          x: e.clientX - toolbarRect.left,
+          y: e.clientY - toolbarRect.top
         });
       }
     }
@@ -299,24 +300,24 @@ export const TextEditor = () => {
   };
 
   return (
-    <div 
-      ref={editorRef}
-      className="floating-editor-container animate-in"
-      style={{ 
-        left: `${position.x}px`,
-        top: `${position.y}px`
-      }}
-    >
+    <div className="editor-container">
       <div 
-        className="drag-handle" 
-        ref={dragHandleRef}
-        onMouseDown={handleDragStart}
+        ref={toolbarRef}
+        className="floating-toolbar-container animate-in"
+        style={{ 
+          left: `${toolbarPosition.x}px`,
+          top: `${toolbarPosition.y}px`
+        }}
       >
-        <GripVertical size={16} />
-        <div className="drag-handle-text">Drag to move</div>
-      </div>
-      
-      <div className="editor-container">
+        <div 
+          className="drag-handle" 
+          ref={dragHandleRef}
+          onMouseDown={handleDragStart}
+        >
+          <GripVertical size={16} />
+          <div className="drag-handle-text">Drag to move toolbar</div>
+        </div>
+        
         <Toolbar 
           execCommand={execCommand}
           editorState={editorState}
@@ -332,8 +333,9 @@ export const TextEditor = () => {
           onParagraphStyle={handleParagraphStyle}
           onTextStyle={handleTextStyle}
         />
-        <ContentArea ref={contentRef} />
       </div>
+      
+      <ContentArea ref={contentRef} />
     </div>
   );
 };
