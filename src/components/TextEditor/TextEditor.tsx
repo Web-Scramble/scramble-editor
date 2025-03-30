@@ -4,6 +4,7 @@ import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
 import { GripVertical, Minimize, Plus } from 'lucide-react';
+import { useIsMobile } from '../../hooks/use-mobile';
 
 export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
@@ -17,6 +18,10 @@ export const TextEditor = () => {
     showParagraphStyleMenu: false,
     showTextStyleMenu: false,
   });
+  
+  // Add state for mobile tabs
+  const [activeTab, setActiveTab] = useState('format');
+  const isMobile = useIsMobile();
   
   const contentRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -334,6 +339,35 @@ export const TextEditor = () => {
           </div>
         </div>
         
+        {!isMinimized && isMobile && (
+          <div className="mobile-toolbar-tabs">
+            <div 
+              className={`mobile-tab ${activeTab === 'format' ? 'active' : ''}`}
+              onClick={() => setActiveTab('format')}
+            >
+              Format
+            </div>
+            <div 
+              className={`mobile-tab ${activeTab === 'insert' ? 'active' : ''}`}
+              onClick={() => setActiveTab('insert')}
+            >
+              Insert
+            </div>
+            <div 
+              className={`mobile-tab ${activeTab === 'style' ? 'active' : ''}`}
+              onClick={() => setActiveTab('style')}
+            >
+              Style
+            </div>
+            <div 
+              className={`mobile-tab ${activeTab === 'paragraph' ? 'active' : ''}`}
+              onClick={() => setActiveTab('paragraph')}
+            >
+              Paragraph
+            </div>
+          </div>
+        )}
+        
         {!isMinimized && (
           <Toolbar 
             execCommand={execCommand}
@@ -349,6 +383,8 @@ export const TextEditor = () => {
             insertDivider={insertDivider}
             onParagraphStyle={handleParagraphStyle}
             onTextStyle={handleTextStyle}
+            isMobile={isMobile}
+            activeTab={activeTab}
           />
         )}
       </div>

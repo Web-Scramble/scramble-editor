@@ -34,6 +34,8 @@ interface ToolbarProps {
   insertDivider: () => void;
   onParagraphStyle: (command: string) => void;
   onTextStyle: (command: string) => void;
+  isMobile?: boolean;
+  activeTab?: string;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -49,16 +51,25 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   handleAttachment,
   insertDivider,
   onParagraphStyle,
-  onTextStyle
+  onTextStyle,
+  isMobile = false,
+  activeTab = 'format'
 }) => {
   const handleButtonClick = (e: React.MouseEvent, command: string, value: any = null) => {
     e.preventDefault();
     execCommand(command, false, value);
   };
 
+  // Check if a group should be active based on the current tab
+  const isGroupActive = (group: string) => {
+    if (!isMobile) return true;
+    return group === activeTab;
+  };
+
   return (
     <div className="toolbar">
-      <div className="toolbar-group">
+      {/* History Controls */}
+      <div className={`toolbar-group ${isGroupActive('format') ? 'active' : ''}`}>
         <button className="btn" title="Undo" onClick={(e) => handleButtonClick(e, 'undo')}>
           <Undo size={16} />
         </button>
@@ -67,9 +78,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </button>
       </div>
 
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
+      {/* Text Style Dropdown */}
+      <div className={`toolbar-group ${isGroupActive('format') ? 'active' : ''}`}>
         <div className="dropdown">
           <button 
             className="dropdown-btn" 
@@ -104,9 +114,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </div>
       </div>
 
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
+      {/* Paragraph Alignment */}
+      <div className={`toolbar-group ${isGroupActive('paragraph') ? 'active' : ''}`}>
         <div className="dropdown">
           <button 
             className="dropdown-btn" 
@@ -135,9 +144,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </div>
       </div>
 
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
+      {/* Text Formatting */}
+      <div className={`toolbar-group ${isGroupActive('format') ? 'active' : ''}`}>
         <button className="btn" title="Bold" onClick={(e) => handleButtonClick(e, 'bold')}>
           <Bold size={16} />
         </button>
@@ -152,9 +160,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </button>
       </div>
 
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
+      {/* Link */}
+      <div className={`toolbar-group ${isGroupActive('insert') ? 'active' : ''}`}>
         <button className="btn" title="Link" onClick={(e) => {
           const url = prompt('Enter URL:');
           if (url) handleButtonClick(e, 'createLink', url);
@@ -163,9 +170,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </button>
       </div>
 
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
+      {/* Lists */}
+      <div className={`toolbar-group ${isGroupActive('paragraph') ? 'active' : ''}`}>
         <button className="btn" title="Bullet List" onClick={(e) => handleButtonClick(e, 'insertUnorderedList')}>
           <List size={16} />
         </button>
@@ -174,9 +180,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </button>
       </div>
 
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
+      {/* Tables and Attachments */}
+      <div className={`toolbar-group ${isGroupActive('insert') ? 'active' : ''}`}>
         <button className="btn" title="Insert Table" onClick={(e) => {
           const html = '<table style="width:100%; border-collapse: collapse;"><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr></table><p></p>';
           execCommand('insertHTML', false, html);
@@ -187,10 +192,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <Paperclip size={16} />
         </button>
       </div>
-
-      <div className="toolbar-divider"></div>
       
-      <div className="toolbar-group">
+      {/* Text Styling Tools */}
+      <div className={`toolbar-group ${isGroupActive('style') ? 'active' : ''}`}>
         <div className="dropdown" id="font-size-dropdown">
           <div className="font-size-container">
             <NumberInput initialValue={16} min={8} max={96} onChange={onFontSizeChange} />
@@ -248,9 +252,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </div>
       </div>
 
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
+      {/* Special Format Options */}
+      <div className={`toolbar-group ${isGroupActive('insert') ? 'active' : ''}`}>
         <button className="btn" title="Add Code Block" onClick={insertCodeBlock}>
           <Code size={16} />
         </button>

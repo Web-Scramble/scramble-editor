@@ -1,3 +1,4 @@
+
 .editor-container {
   width: 100%;
   max-width: 900px;
@@ -94,12 +95,6 @@
   display: flex;
   gap: 4px;
   margin-right: 8px;
-}
-
-.toolbar-divider {
-  width: 1px;
-  background-color: #e0e0e0;
-  margin: 0 8px;
 }
 
 .btn {
@@ -547,6 +542,11 @@
   background-color: rgba(0, 0, 0, 0.05);
 }
 
+/* Mobile styling and responsiveness improvements */
+.mobile-toolbar-tabs {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .editor-container {
     max-width: 100%;
@@ -557,20 +557,58 @@
   .toolbar {
     padding: 8px 4px;
     overflow-x: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
   }
   
   .toolbar-group {
     margin-right: 4px;
   }
   
-  .toolbar-divider {
-    margin: 0 4px;
-  }
-  
   .floating-toolbar-container {
     width: 95vw;
     left: 2.5vw !important;
     right: 2.5vw !important;
+  }
+  
+  /* Show tabs on mobile */
+  .mobile-toolbar-tabs {
+    display: flex;
+    overflow-x: auto;
+    border-bottom: 1px solid #eee;
+    padding: 0 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .mobile-tab {
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+  
+  .mobile-tab.active {
+    color: #1a73e8;
+    border-bottom-color: #1a73e8;
+  }
+  
+  /* Hide toolbar groups based on active tab */
+  .toolbar-group {
+    display: none;
+  }
+  
+  .toolbar-group.active {
+    display: flex;
+  }
+  
+  /* Make all toolbar groups fill width on mobile */
+  .toolbar-group.active {
+    width: 100%;
+    justify-content: space-around;
+    margin-right: 0;
   }
 }
 
@@ -583,4 +621,9 @@
   .content-area {
     padding: 12px;
   }
+  
+  .drag-handle-text {
+    font-size: 10px;
+  }
 }
+
