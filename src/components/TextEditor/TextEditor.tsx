@@ -3,13 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
-import { X } from 'lucide-react';
 
-interface TextEditorProps {
-  onClose: () => void;
-}
-
-export const TextEditor: React.FC<TextEditorProps> = ({ onClose }) => {
+export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
     currentColor: '#000000',
     currentHighlightColor: '#FFFF00', // Default highlight color
@@ -22,51 +17,7 @@ export const TextEditor: React.FC<TextEditorProps> = ({ onClose }) => {
     showTextStyleMenu: false,
   });
   
-  // State for dragging functionality
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 100, y: 100 });
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  
   const contentRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
-
-  // Handle dragging
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        setPosition({
-          x: e.clientX - dragOffset.x,
-          y: e.clientY - dragOffset.y
-        });
-      }
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
-
-  // Start dragging
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (editorRef.current) {
-      const rect = editorRef.current.getBoundingClientRect();
-      setDragOffset({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      });
-      setIsDragging(true);
-    }
-  };
 
   useEffect(() => {
     // Close dropdowns when clicking outside
@@ -306,44 +257,23 @@ export const TextEditor: React.FC<TextEditorProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="floating-editor-backdrop">
-      <div 
-        ref={editorRef}
-        className="floating-editor-container animate-in" 
-        style={{ 
-          left: `${position.x}px`, 
-          top: `${position.y}px` 
-        }}
-      >
-        <div className="floating-editor-header" onMouseDown={handleMouseDown}>
-          <div className="drag-handle">Drag me</div>
-          <button 
-            className="close-button" 
-            onClick={onClose}
-            aria-label="Close editor"
-          >
-            <X size={16} />
-          </button>
-        </div>
-        <div className="editor-container">
-          <Toolbar 
-            execCommand={execCommand}
-            editorState={editorState}
-            onColorChange={handleColorChange}
-            onHighlightChange={handleHighlightChange}
-            onFontSizeChange={handleFontSizeChange}
-            onEmojiSelect={handleEmojiSelect}
-            toggleDropdown={toggleDropdown}
-            insertCodeBlock={insertCodeBlock}
-            insertEquation={insertEquation}
-            handleAttachment={handleAttachment}
-            insertDivider={insertDivider}
-            onParagraphStyle={handleParagraphStyle}
-            onTextStyle={handleTextStyle}
-          />
-          <ContentArea ref={contentRef} />
-        </div>
-      </div>
+    <div className="editor-container animate-in">
+      <Toolbar 
+        execCommand={execCommand}
+        editorState={editorState}
+        onColorChange={handleColorChange}
+        onHighlightChange={handleHighlightChange}
+        onFontSizeChange={handleFontSizeChange}
+        onEmojiSelect={handleEmojiSelect}
+        toggleDropdown={toggleDropdown}
+        insertCodeBlock={insertCodeBlock}
+        insertEquation={insertEquation}
+        handleAttachment={handleAttachment}
+        insertDivider={insertDivider}
+        onParagraphStyle={handleParagraphStyle}
+        onTextStyle={handleTextStyle}
+      />
+      <ContentArea ref={contentRef} />
     </div>
   );
 };
