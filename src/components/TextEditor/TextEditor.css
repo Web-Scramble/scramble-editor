@@ -2,10 +2,26 @@
   width: 100%;
   max-width: 900px;
   background-color: white;
-  border-radius: 3px;
+  border-radius: 5px;
   overflow: hidden;
   margin: 0 auto;
-  box-shadow: none;
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.15);
+}
+
+.floating-editor-container {
+  position: relative;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  animation: float-in 0.2s ease-out;
+}
+
+@keyframes float-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .toolbar {
@@ -88,7 +104,9 @@
 
 .content-area {
   padding: 16px 0;
-  min-height: calc(100vh - 100px);
+  min-height: calc(70vh);
+  max-height: calc(80vh);
+  overflow-y: auto;
   outline: none;
   line-height: 1.6;
 }
