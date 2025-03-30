@@ -4,7 +4,7 @@ import {
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
   Code, Link2, List, ListOrdered, Image, Table, Paperclip,
-  Type, Smile, Undo, Redo, FileText
+  Type, Smile, Undo, Redo
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { FontSizePicker } from './FontSizePicker';
@@ -14,16 +14,19 @@ interface ToolbarProps {
   execCommand: (command: string, showUI?: boolean, value?: any) => void;
   editorState: {
     currentColor: string;
+    currentHighlightColor: string;
     currentFontSize: string;
     showColorPicker: boolean;
+    showHighlightPicker: boolean;
     showFontSizePicker: boolean;
     showEmojiPicker: boolean;
     showParagraphStyleMenu: boolean;
   };
   onColorChange: (color: string) => void;
+  onHighlightChange: (color: string) => void;
   onFontSizeChange: (size: string) => void;
   onEmojiSelect: (emoji: string) => void;
-  toggleDropdown: (dropdown: 'color' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => void;
+  toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => void;
   insertCodeBlock: () => void;
   insertEquation: () => void;
   insertImage: () => void;
@@ -36,6 +39,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   execCommand,
   editorState,
   onColorChange,
+  onHighlightChange,
   onFontSizeChange,
   onEmojiSelect,
   toggleDropdown,
@@ -82,26 +86,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             title="Paragraph Style"
             onClick={(e) => toggleDropdown('paragraphStyle', e)}
           >
-            <FileText size={16} />
+            <AlignLeft size={16} />
             <span className="arrow">▼</span>
           </button>
           {editorState.showParagraphStyleMenu && (
             <div className="paragraph-style-menu">
               <div className="paragraph-option" onClick={() => onParagraphStyle('justifyLeft')}>
                 <AlignLeft size={16} />
-                <span>Align Left</span>
               </div>
               <div className="paragraph-option" onClick={() => onParagraphStyle('justifyCenter')}>
                 <AlignCenter size={16} />
-                <span>Align Center</span>
               </div>
               <div className="paragraph-option" onClick={() => onParagraphStyle('justifyRight')}>
                 <AlignRight size={16} />
-                <span>Align Right</span>
               </div>
               <div className="paragraph-option" onClick={() => onParagraphStyle('justifyFull')}>
                 <AlignJustify size={16} />
-                <span>Justify</span>
               </div>
             </div>
           )}
@@ -128,9 +128,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       <div className="toolbar-divider"></div>
 
       <div className="toolbar-group">
-        <button className="btn" title="Code" onClick={(e) => handleButtonClick(e, 'formatBlock', '<pre>')}>
-          <Code size={16} />
-        </button>
         <button className="btn" title="Link" onClick={(e) => {
           const url = prompt('Enter URL:');
           if (url) handleButtonClick(e, 'createLink', url);
@@ -197,7 +194,24 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <span className="arrow">▼</span>
           </button>
           {editorState.showColorPicker && (
-            <ColorPicker onSelect={onColorChange} />
+            <ColorPicker onSelect={onColorChange} type="foreColor" />
+          )}
+        </div>
+
+        <div className="dropdown" id="highlight-dropdown">
+          <button 
+            className="dropdown-btn" 
+            title="Highlight Color"
+            onClick={(e) => toggleDropdown('highlight', e)}
+          >
+            <span 
+              className="highlight-preview" 
+              style={{ backgroundColor: editorState.currentHighlightColor }} 
+            ></span>
+            <span className="arrow">▼</span>
+          </button>
+          {editorState.showHighlightPicker && (
+            <ColorPicker onSelect={onHighlightChange} type="hiliteColor" />
           )}
         </div>
         
@@ -222,7 +236,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <Code size={16} />
         </button>
         <button className="btn" title="Insert Equation" onClick={insertEquation}>
-          <span className="math-icon">∑</span>
+          <span className="math-icon">∫</span>
         </button>
         <button className="btn" title="Insert Quote" onClick={(e) => handleButtonClick(e, 'formatBlock', '<blockquote>')}>
           <span className="quote-icon">"</span>

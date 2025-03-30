@@ -27,7 +27,7 @@ function calculateQuadratic(a, b, c) {
           
           <p>You can now add LaTeX equations like this:</p>
           
-          <div class="equation equation-rendered">$\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$</div>
+          <div class="equation equation-rendered">$\\int_{a}^{b} f(x) \\, dx$</div>
           
           <p>Double-click the equation to edit it in LaTeX format.</p>
         `;

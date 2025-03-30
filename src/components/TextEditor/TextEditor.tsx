@@ -7,8 +7,10 @@ import './TextEditor.css';
 export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
     currentColor: '#000000',
+    currentHighlightColor: '#FFFF00', // Default highlight color
     currentFontSize: '16px',
     showColorPicker: false,
+    showHighlightPicker: false,
     showFontSizePicker: false,
     showEmojiPicker: false,
     showParagraphStyleMenu: false,
@@ -22,6 +24,7 @@ export const TextEditor = () => {
       setEditorState(prev => ({
         ...prev,
         showColorPicker: false,
+        showHighlightPicker: false,
         showFontSizePicker: false,
         showEmojiPicker: false,
         showParagraphStyleMenu: false
@@ -48,6 +51,15 @@ export const TextEditor = () => {
       showColorPicker: false
     });
     execCommand('foreColor', false, color);
+  };
+
+  const handleHighlightChange = (color: string) => {
+    setEditorState({
+      ...editorState,
+      currentHighlightColor: color,
+      showHighlightPicker: false
+    });
+    execCommand('hiliteColor', false, color);
   };
 
   const handleFontSizeChange = (size: string) => {
@@ -78,11 +90,12 @@ export const TextEditor = () => {
     }
   };
 
-  const toggleDropdown = (dropdown: 'color' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => {
+  const toggleDropdown = (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => {
     e.stopPropagation();
     const updatedState = {
       ...editorState,
       showColorPicker: dropdown === 'color' ? !editorState.showColorPicker : false,
+      showHighlightPicker: dropdown === 'highlight' ? !editorState.showHighlightPicker : false,
       showFontSizePicker: dropdown === 'fontSize' ? !editorState.showFontSizePicker : false,
       showEmojiPicker: dropdown === 'emoji' ? !editorState.showEmojiPicker : false,
       showParagraphStyleMenu: dropdown === 'paragraphStyle' ? !editorState.showParagraphStyleMenu : false,
@@ -106,6 +119,19 @@ export const TextEditor = () => {
         
         // Clear selection
         selection.removeAllRanges();
+      } else {
+        // If no text is selected, insert an empty code block
+        const codeBlock = document.createElement('div');
+        codeBlock.className = 'code-block animate-in';
+        codeBlock.textContent = '// Add your code here';
+        
+        range.insertNode(codeBlock);
+        
+        // Select the placeholder text
+        const newRange = document.createRange();
+        newRange.selectNodeContents(codeBlock);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
       }
     }
   };
@@ -114,7 +140,7 @@ export const TextEditor = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-      const selectedText = range.toString() || '\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}';
+      const selectedText = range.toString() || '\\int_{a}^{b} f(x) \\, dx';
       
       // Create the equation container
       const equation = document.createElement('div');
@@ -148,7 +174,6 @@ export const TextEditor = () => {
       
       // Add blur event to render the equation
       equation.addEventListener('blur', function() {
-        // This is where we would render the LaTeX in a real implementation
         equation.classList.add('equation-rendered');
       });
       
@@ -269,6 +294,7 @@ export const TextEditor = () => {
         execCommand={execCommand}
         editorState={editorState}
         onColorChange={handleColorChange}
+        onHighlightChange={handleHighlightChange}
         onFontSizeChange={handleFontSizeChange}
         onEmojiSelect={handleEmojiSelect}
         toggleDropdown={toggleDropdown}
