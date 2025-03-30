@@ -1,4 +1,3 @@
-
 .editor-container {
   width: 100%;
   max-width: 900px;
@@ -463,3 +462,6 @@ blockquote {
     gap: 6px;
   }
 }
+
+/* Import Table Selector Styles */
+@import './TableSelector.css';

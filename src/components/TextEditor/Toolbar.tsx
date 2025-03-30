@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
@@ -57,8 +57,26 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   handleRedo
 }) => {
   const [showTableDialog, setShowTableDialog] = useState(false);
+  const [showTableSelector, setShowTableSelector] = useState(false);
   const [tableRows, setTableRows] = useState(2);
   const [tableCols, setTableCols] = useState(2);
+  const [selectedCells, setSelectedCells] = useState({ rows: 0, cols: 0 });
+  const [hoveredCells, setHoveredCells] = useState({ rows: 0, cols: 0 });
+  const tableGridRef = useRef<HTMLDivElement>(null);
+
+  const MAX_GRID_SIZE = 10;
+
+  useEffect(() => {
+    // Close table selector when clicking outside
+    const handleClickOutside = (e: MouseEvent) => {
+      if (tableGridRef.current && !tableGridRef.current.contains(e.target as Node)) {
+        setShowTableSelector(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleButtonClick = (e: React.MouseEvent, command: string, value: any = null) => {
     e.preventDefault();
@@ -74,6 +92,48 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   // Helper function to prevent events from bubbling up
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  const handleTableSelect = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (selectedCells.rows > 0 && selectedCells.cols > 0) {
+      insertTable(selectedCells.rows, selectedCells.cols);
+      setShowTableSelector(false);
+    }
+  };
+
+  const handleTableCellHover = (rows: number, cols: number) => {
+    setHoveredCells({ rows, cols });
+  };
+
+  const handleTableCellClick = (rows: number, cols: number) => {
+    setSelectedCells({ rows, cols });
+    insertTable(rows, cols);
+    setShowTableSelector(false);
+  };
+
+  const generateTableGrid = () => {
+    const grid = [];
+    
+    for (let i = 0; i < MAX_GRID_SIZE; i++) {
+      const row = [];
+      for (let j = 0; j < MAX_GRID_SIZE; j++) {
+        const isHighlighted = i < hoveredCells.rows && j < hoveredCells.cols;
+        
+        row.push(
+          <div
+            key={`${i}-${j}`}
+            className={`table-grid-cell ${isHighlighted ? 'highlighted' : ''}`}
+            onMouseOver={() => handleTableCellHover(i + 1, j + 1)}
+            onClick={() => handleTableCellClick(i + 1, j + 1)}
+          />
+        );
+      }
+      grid.push(<div key={i} className="table-grid-row">{row}</div>);
+    }
+    
+    return grid;
   };
 
   return (
@@ -218,12 +278,28 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         <button className="btn" title="Insert Image" onClick={insertImage}>
           <Image size={16} />
         </button>
-        <button 
-          className="btn" 
-          title="Insert Table" 
-          onClick={() => setShowTableDialog(prev => !prev)}
-        >
-          <Table size={16} />
+        <div className="table-button-container">
+          <button 
+            className="btn" 
+            title="Insert Table" 
+            onClick={() => setShowTableSelector(!showTableSelector)}
+          >
+            <Table size={16} />
+          </button>
+          
+          {showTableSelector && (
+            <div className="table-selector" ref={tableGridRef} onClick={stopPropagation}>
+              <div className="table-selector-header">
+                {hoveredCells.rows > 0 && hoveredCells.cols > 0 ? (
+                  `${hoveredCells.rows} × ${hoveredCells.cols} Table`
+                ) : 'Insert Table'}
+              </div>
+              <div className="table-grid-container">
+                {generateTableGrid()}
+              </div>
+            </div>
+          )}
+          
           {showTableDialog && (
             <div className="table-dialog" onClick={stopPropagation}>
               <div className="table-dialog-header">Insert Table</div>
@@ -265,7 +341,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               </div>
             </div>
           )}
-        </button>
+        </div>
         <button className="btn" title="Attach File" onClick={handleAttachment}>
           <Paperclip size={16} />
         </button>

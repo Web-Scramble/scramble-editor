@@ -411,8 +411,9 @@ export const TextEditor = () => {
   const insertTable = (rows: number, cols: number) => {
     if (!contentRef.current) return;
     
+    // Create table element
     const table = document.createElement('table');
-    table.className = 'editor-table';
+    table.className = 'editor-table animate-in';
     table.style.width = '100%';
     table.style.borderCollapse = 'collapse';
     table.style.marginBottom = '1em';
@@ -426,6 +427,7 @@ export const TextEditor = () => {
       th.style.border = '1px solid #ccc';
       th.style.padding = '8px';
       th.style.backgroundColor = '#f3f3f3';
+      th.contentEditable = 'true';
       th.appendChild(document.createElement('br'));
       headerRow.appendChild(th);
     }
@@ -444,6 +446,7 @@ export const TextEditor = () => {
         td.style.border = '1px solid #ccc';
         td.style.padding = '8px';
         td.style.position = 'relative';
+        td.contentEditable = 'true';
         td.appendChild(document.createElement('br'));
         tr.appendChild(td);
       }

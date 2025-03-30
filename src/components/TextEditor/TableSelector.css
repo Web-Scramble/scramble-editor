@@ -1,0 +1,157 @@
+
+/* Table Selector Styles */
+.table-button-container {
+  position: relative;
+}
+
+.table-selector {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  min-width: 280px;
+  animation: fade-in 0.2s ease-out;
+}
+
+.table-selector-header {
+  font-size: 14px;
+  font-weight: 500;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.table-grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.table-grid-row {
+  display: flex;
+  gap: 2px;
+}
+
+.table-grid-cell {
+  width: 24px;
+  height: 24px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.table-grid-cell:hover,
+.table-grid-cell.highlighted {
+  background-color: #0066ff;
+}
+
+/* Table Styles */
+.editor-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  background-color: white;
+}
+
+.editor-table th,
+.editor-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  position: relative;
+  min-width: 50px;
+}
+
+.editor-table th {
+  background-color: #f3f3f3;
+  font-weight: bold;
+}
+
+.editor-table td:focus,
+.editor-table th:focus {
+  outline: 2px solid #0066ff;
+  outline-offset: -2px;
+}
+
+/* Dialog Styles */
+.table-dialog {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  min-width: 220px;
+}
+
+.table-dialog-header {
+  font-size: 14px;
+  font-weight: 500;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.table-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.table-dialog-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-dialog-row input {
+  width: 60px;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.table-dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.table-dialog-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.table-dialog-button.cancel {
+  background-color: #f2f2f2;
+}
+
+.table-dialog-button.insert {
+  background-color: #0066ff;
+  color: white;
+}
+
+/* Animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
