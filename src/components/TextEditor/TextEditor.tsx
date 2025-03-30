@@ -1,8 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
+import { X, GripVertical } from 'lucide-react';
 
 export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
@@ -18,11 +18,15 @@ export const TextEditor = () => {
   });
   
   const contentRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const dragHandleRef = useRef<HTMLDivElement>(null);
+  
+  const [position, setPosition] = useState({ x: 100, y: 100 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Close dropdowns when clicking outside
     const handleClickOutside = (event: MouseEvent) => {
-      // Don't close if clicking inside a dropdown or button
       if ((event.target as Element)?.closest('.dropdown, .dropdown-btn')) {
         return;
       }
@@ -43,6 +47,53 @@ export const TextEditor = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      
+      const newX = e.clientX - dragOffset.x;
+      const newY = e.clientY - dragOffset.y;
+      
+      const editorRect = editorRef.current?.getBoundingClientRect();
+      if (editorRect) {
+        const maxX = window.innerWidth - editorRect.width;
+        const maxY = window.innerHeight - editorRect.height;
+        
+        setPosition({
+          x: Math.max(0, Math.min(newX, maxX)),
+          y: Math.max(0, Math.min(newY, maxY))
+        });
+      }
+    };
+    
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+    
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, dragOffset]);
+
+  const handleDragStart = (e: React.MouseEvent) => {
+    if (e.target === dragHandleRef.current || (e.target as Element).closest('.drag-handle')) {
+      const editorRect = editorRef.current?.getBoundingClientRect();
+      if (editorRect) {
+        setIsDragging(true);
+        setDragOffset({
+          x: e.clientX - editorRect.left,
+          y: e.clientY - editorRect.top
+        });
+      }
+    }
+  };
 
   const execCommand = (command: string, showUI = false, value: any = null) => {
     document.execCommand(command, showUI, value);
@@ -126,7 +177,6 @@ export const TextEditor = () => {
       range.deleteContents();
       range.insertNode(codeBlock);
       
-      // Clear selection
       selection.removeAllRanges();
     }
   };
@@ -137,11 +187,9 @@ export const TextEditor = () => {
       const range = selection.getRangeAt(0);
       const selectedText = range.toString() || '\\int_{a}^{b} f(x) \\, dx';
       
-      // Create the equation container
       const equation = document.createElement('div');
       equation.className = 'equation animate-in';
       
-      // Create the LaTeX markdown format
       let latexContent = selectedText;
       if (!latexContent.startsWith('$') && !latexContent.endsWith('$')) {
         latexContent = '$' + latexContent + '$';
@@ -154,9 +202,7 @@ export const TextEditor = () => {
       range.deleteContents();
       range.insertNode(equation);
       
-      // Setup equation for editing
       equation.addEventListener('dblclick', function() {
-        // Place cursor inside the equation for easy editing
         const range = document.createRange();
         range.selectNodeContents(this);
         const selection = window.getSelection();
@@ -167,12 +213,10 @@ export const TextEditor = () => {
         equation.classList.remove('equation-rendered');
       });
       
-      // Add blur event to render the equation
       equation.addEventListener('blur', function() {
         equation.classList.add('equation-rendered');
       });
       
-      // Clear selection
       selection.removeAllRanges();
     }
   };
@@ -227,12 +271,10 @@ export const TextEditor = () => {
       range.deleteContents();
       range.insertNode(hr);
       
-      // Add a paragraph after the divider to continue typing
       const p = document.createElement('p');
       p.appendChild(document.createElement('br'));
       hr.parentNode?.insertBefore(p, hr.nextSibling);
       
-      // Set cursor to the new paragraph
       const newRange = document.createRange();
       newRange.setStart(p, 0);
       selection.removeAllRanges();
@@ -257,23 +299,41 @@ export const TextEditor = () => {
   };
 
   return (
-    <div className="editor-container animate-in">
-      <Toolbar 
-        execCommand={execCommand}
-        editorState={editorState}
-        onColorChange={handleColorChange}
-        onHighlightChange={handleHighlightChange}
-        onFontSizeChange={handleFontSizeChange}
-        onEmojiSelect={handleEmojiSelect}
-        toggleDropdown={toggleDropdown}
-        insertCodeBlock={insertCodeBlock}
-        insertEquation={insertEquation}
-        handleAttachment={handleAttachment}
-        insertDivider={insertDivider}
-        onParagraphStyle={handleParagraphStyle}
-        onTextStyle={handleTextStyle}
-      />
-      <ContentArea ref={contentRef} />
+    <div 
+      ref={editorRef}
+      className="floating-editor-container animate-in"
+      style={{ 
+        left: `${position.x}px`,
+        top: `${position.y}px`
+      }}
+    >
+      <div 
+        className="drag-handle" 
+        ref={dragHandleRef}
+        onMouseDown={handleDragStart}
+      >
+        <GripVertical size={16} />
+        <div className="drag-handle-text">Drag to move</div>
+      </div>
+      
+      <div className="editor-container">
+        <Toolbar 
+          execCommand={execCommand}
+          editorState={editorState}
+          onColorChange={handleColorChange}
+          onHighlightChange={handleHighlightChange}
+          onFontSizeChange={handleFontSizeChange}
+          onEmojiSelect={handleEmojiSelect}
+          toggleDropdown={toggleDropdown}
+          insertCodeBlock={insertCodeBlock}
+          insertEquation={insertEquation}
+          handleAttachment={handleAttachment}
+          insertDivider={insertDivider}
+          onParagraphStyle={handleParagraphStyle}
+          onTextStyle={handleTextStyle}
+        />
+        <ContentArea ref={contentRef} />
+      </div>
     </div>
   );
 };
