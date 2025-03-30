@@ -13,7 +13,7 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
       if (contentRef.current) {
         // Initialize with some content that demonstrates the rich text features
         contentRef.current.innerHTML = `
-          <h1>Rich Text Editor Demo</h1>
+          <h1>Untitled</h1>
           
           <p>This is a <strong>rich text editor</strong> with support for <em>various</em> <u>formatting</u> options.</p>
           
@@ -91,7 +91,7 @@ function calculateQuadratic(a, b, c) {
     // Apply focus styles
     const handleFocus = () => {
       if (contentRef.current) {
-        contentRef.current.style.boxShadow = '0 0 0 2px rgba(66, 133, 244, 0.2)';
+        contentRef.current.style.boxShadow = 'none';
         contentRef.current.style.transition = 'box-shadow 0.2s ease';
       }
     };
