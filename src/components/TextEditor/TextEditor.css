@@ -1,3 +1,4 @@
+
 .editor-container {
   width: 100%;
   max-width: 900px;
@@ -15,12 +16,14 @@
   background-color: #f9f9f9;
   flex-wrap: wrap;
   gap: 4px;
+  position: relative;
 }
 
 .toolbar-group {
   display: flex;
   gap: 4px;
   margin-right: 8px;
+  position: relative;
 }
 
 .toolbar-divider {
@@ -41,6 +44,7 @@
   justify-content: center;
   color: #5f6368;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .btn:hover {
@@ -81,6 +85,14 @@
 .dropdown-btn .arrow {
   margin-left: 4px;
   font-size: 10px;
+}
+
+.dropdown-btn .dropdown-label {
+  display: inline-block;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .content-area {
@@ -160,7 +172,7 @@
   text-align: center;
 }
 
-.color-picker, .font-size-picker, .emoji-picker {
+.color-picker, .font-size-picker, .emoji-picker, .dropdown-menu {
   position: absolute;
   top: 100%;
   left: 0;
@@ -172,6 +184,22 @@
   z-index: 100;
   animation: fadeIn 0.2s ease-out;
   margin-top: 4px;
+}
+
+.dropdown-menu {
+  min-width: 180px;
+}
+
+.dropdown-item {
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f3f4;
 }
 
 .emoji-picker {
@@ -264,6 +292,94 @@
   font-size: 16px;
 }
 
+.editor-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.editor-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  min-width: 50px;
+  position: relative;
+}
+
+.table-dialog {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  width: 250px;
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.table-dialog-header {
+  padding: 10px 15px;
+  font-weight: 500;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+.table-dialog-content {
+  padding: 15px;
+}
+
+.table-dialog-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.table-dialog-row label {
+  flex: 0 0 70px;
+}
+
+.table-dialog-row input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.table-dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.table-dialog-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+}
+
+.table-dialog-button.cancel {
+  background-color: #f1f3f4;
+  color: #5f6368;
+}
+
+.table-dialog-button.insert {
+  background-color: #1a73e8;
+  color: white;
+}
+
+blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 16px;
+  margin: 16px 0;
+  color: #555;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
@@ -283,6 +399,11 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+.mr-2 {
+  margin-right: 8px;
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
   .editor-container {
     max-width: 100%;
@@ -301,6 +422,10 @@
   
   .toolbar-divider {
     margin: 0 4px;
+  }
+
+  .dropdown-btn .dropdown-label {
+    display: none;
   }
 }
 

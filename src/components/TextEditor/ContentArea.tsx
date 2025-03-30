@@ -4,7 +4,7 @@ import KaTeX from 'katex';
 import 'katex/dist/katex.min.css';
 
 interface ContentAreaProps {
-  // Any props can be added here if needed
+  onContentChange?: () => void;
 }
 
 export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
@@ -94,6 +94,19 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
         // Render all equations in case content changed
         setTimeout(() => renderEquations(), 10);
       }
+
+      // Notify parent about content change
+      if (props.onContentChange) {
+        props.onContentChange();
+      }
+    };
+
+    // Handle input events to ensure proper history tracking for undo/redo
+    const handleInput = () => {
+      if (props.onContentChange) {
+        props.onContentChange();
+      }
+      setTimeout(renderEquations, 100);
     };
 
     return (
@@ -105,7 +118,7 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
         onClick={handleInitialClick}
         onDoubleClick={handleDoubleClick}
         onBlur={handleBlur}
-        onInput={() => setTimeout(renderEquations, 100)}
+        onInput={handleInput}
       >
         <p>Start typing here...</p>
       </div>
