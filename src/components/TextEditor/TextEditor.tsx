@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Minimize, Plus } from 'lucide-react';
 
 export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
@@ -25,6 +25,7 @@ export const TextEditor = () => {
   const [toolbarPosition, setToolbarPosition] = useState({ x: 20, y: 20 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isMinimized, setIsMinimized] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -94,6 +95,10 @@ export const TextEditor = () => {
         });
       }
     }
+  };
+
+  const toggleMinimize = () => {
+    setIsMinimized(!isMinimized);
   };
 
   const execCommand = (command: string, showUI = false, value: any = null) => {
@@ -303,7 +308,7 @@ export const TextEditor = () => {
     <div className="editor-container">
       <div 
         ref={toolbarRef}
-        className="floating-toolbar-container animate-in"
+        className={`floating-toolbar-container animate-in ${isMinimized ? 'minimized' : ''}`}
         style={{ 
           left: `${toolbarPosition.x}px`,
           top: `${toolbarPosition.y}px`
@@ -315,24 +320,37 @@ export const TextEditor = () => {
           onMouseDown={handleDragStart}
         >
           <GripVertical size={16} />
-          <div className="drag-handle-text">Drag to move toolbar</div>
+          <div className="drag-handle-text">
+            {isMinimized ? "Editor" : "Drag to move toolbar"}
+          </div>
+          <div className="toolbar-controls">
+            <button 
+              className="minimize-btn" 
+              onClick={toggleMinimize} 
+              title={isMinimized ? "Expand" : "Minimize"}
+            >
+              {isMinimized ? <Plus size={16} /> : <Minimize size={16} />}
+            </button>
+          </div>
         </div>
         
-        <Toolbar 
-          execCommand={execCommand}
-          editorState={editorState}
-          onColorChange={handleColorChange}
-          onHighlightChange={handleHighlightChange}
-          onFontSizeChange={handleFontSizeChange}
-          onEmojiSelect={handleEmojiSelect}
-          toggleDropdown={toggleDropdown}
-          insertCodeBlock={insertCodeBlock}
-          insertEquation={insertEquation}
-          handleAttachment={handleAttachment}
-          insertDivider={insertDivider}
-          onParagraphStyle={handleParagraphStyle}
-          onTextStyle={handleTextStyle}
-        />
+        {!isMinimized && (
+          <Toolbar 
+            execCommand={execCommand}
+            editorState={editorState}
+            onColorChange={handleColorChange}
+            onHighlightChange={handleHighlightChange}
+            onFontSizeChange={handleFontSizeChange}
+            onEmojiSelect={handleEmojiSelect}
+            toggleDropdown={toggleDropdown}
+            insertCodeBlock={insertCodeBlock}
+            insertEquation={insertEquation}
+            handleAttachment={handleAttachment}
+            insertDivider={insertDivider}
+            onParagraphStyle={handleParagraphStyle}
+            onTextStyle={handleTextStyle}
+          />
+        )}
       </div>
       
       <ContentArea ref={contentRef} />
