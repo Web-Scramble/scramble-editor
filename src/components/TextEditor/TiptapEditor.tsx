@@ -29,6 +29,7 @@ import OrderedList from '@tiptap/extension-ordered-list';
 import BulletList from '@tiptap/extension-bullet-list';
 import TextAlign from '@tiptap/extension-text-align';
 import FontSize from '@tiptap/extension-font-size';
+import History from '@tiptap/extension-history';
 import { TiptapToolbar } from './TiptapToolbar';
 import './TextEditor.css';
 
@@ -73,6 +74,10 @@ export const TiptapEditor: React.FC = () => {
       }),
       Placeholder.configure({
         placeholder: 'Start typing here...',
+      }),
+      History.configure({
+        depth: 100,
+        newGroupDelay: 500
       }),
     ],
     content: '<p>Start typing here...</p>',
