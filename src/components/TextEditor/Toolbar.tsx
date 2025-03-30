@@ -3,11 +3,11 @@ import React from 'react';
 import { 
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
-  Code, Link2, List, ListOrdered, Image, Table, Paperclip,
-  Type, Smile, Undo, Redo
+  Code, Link2, List, ListOrdered, Table, Paperclip,
+  Smile, Undo, Redo
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
-import { FontSizePicker } from './FontSizePicker';
+import { NumberInput } from './NumberInput';
 import { EmojiPicker } from './EmojiPicker';
 
 interface ToolbarProps {
@@ -29,7 +29,6 @@ interface ToolbarProps {
   toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => void;
   insertCodeBlock: () => void;
   insertEquation: () => void;
-  insertImage: () => void;
   handleAttachment: () => void;
   insertDivider: () => void;
   onParagraphStyle: (command: string) => void;
@@ -45,7 +44,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   toggleDropdown,
   insertCodeBlock,
   insertEquation,
-  insertImage,
   handleAttachment,
   insertDivider,
   onParagraphStyle
@@ -53,6 +51,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   const handleButtonClick = (e: React.MouseEvent, command: string, value: any = null) => {
     e.preventDefault();
     execCommand(command, false, value);
+  };
+
+  const handleFontSizeChange = (size: number) => {
+    onFontSizeChange(`${size}px`);
   };
 
   return (
@@ -150,9 +152,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       <div className="toolbar-divider"></div>
 
       <div className="toolbar-group">
-        <button className="btn" title="Insert Image" onClick={insertImage}>
-          <Image size={16} />
-        </button>
         <button className="btn" title="Insert Table" onClick={(e) => {
           const html = '<table style="width:100%; border-collapse: collapse;"><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr></table><p></p>';
           execCommand('insertHTML', false, html);
@@ -168,30 +167,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       
       <div className="toolbar-group">
         <div className="dropdown" id="font-size-dropdown">
-          <button 
-            className="dropdown-btn" 
-            title="Font Size" 
-            onClick={(e) => toggleDropdown('fontSize', e)}
-          >
-            <Type size={16} />
-            <span className="arrow">▼</span>
-          </button>
-          {editorState.showFontSizePicker && (
-            <FontSizePicker onSelect={onFontSizeChange} />
-          )}
+          <div className="font-size-container">
+            <NumberInput initialValue={16} min={8} max={96} onChange={handleFontSizeChange} />
+          </div>
         </div>
         
         <div className="dropdown" id="color-dropdown">
           <button 
-            className="dropdown-btn" 
+            className="dropdown-btn text-color-btn" 
             title="Font Color"
             onClick={(e) => toggleDropdown('color', e)}
           >
-            <span 
-              className="color-preview" 
+            <span className="text-color-icon">A</span>
+            <div 
+              className="color-bar" 
               style={{ backgroundColor: editorState.currentColor }} 
-            ></span>
-            <span className="arrow">▼</span>
+            ></div>
           </button>
           {editorState.showColorPicker && (
             <ColorPicker onSelect={onColorChange} type="foreColor" />
@@ -200,15 +191,18 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
         <div className="dropdown" id="highlight-dropdown">
           <button 
-            className="dropdown-btn" 
+            className="dropdown-btn highlight-btn" 
             title="Highlight Color"
             onClick={(e) => toggleDropdown('highlight', e)}
           >
-            <span 
-              className="highlight-preview" 
-              style={{ backgroundColor: editorState.currentHighlightColor }} 
-            ></span>
-            <span className="arrow">▼</span>
+            <span className="highlight-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 19l7-7 3 3-7 7-3-3z" />
+                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+                <path d="M2 2l7.586 7.586" />
+                <path d="M11 11l2 2" />
+              </svg>
+            </span>
           </button>
           {editorState.showHighlightPicker && (
             <ColorPicker onSelect={onHighlightChange} type="hiliteColor" />

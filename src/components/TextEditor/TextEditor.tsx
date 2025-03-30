@@ -107,32 +107,17 @@ export const TextEditor = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-      const selectedText = range.toString();
+      const selectedText = range.toString() || '// Add your code here';
       
-      if (selectedText) {
-        const codeBlock = document.createElement('div');
-        codeBlock.className = 'code-block animate-in';
-        codeBlock.textContent = selectedText;
-        
-        range.deleteContents();
-        range.insertNode(codeBlock);
-        
-        // Clear selection
-        selection.removeAllRanges();
-      } else {
-        // If no text is selected, insert an empty code block
-        const codeBlock = document.createElement('div');
-        codeBlock.className = 'code-block animate-in';
-        codeBlock.textContent = '// Add your code here';
-        
-        range.insertNode(codeBlock);
-        
-        // Select the placeholder text
-        const newRange = document.createRange();
-        newRange.selectNodeContents(codeBlock);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-      }
+      const codeBlock = document.createElement('div');
+      codeBlock.className = 'code-block animate-in';
+      codeBlock.textContent = selectedText;
+      
+      range.deleteContents();
+      range.insertNode(codeBlock);
+      
+      // Clear selection
+      selection.removeAllRanges();
     }
   };
 
@@ -180,41 +165,6 @@ export const TextEditor = () => {
       // Clear selection
       selection.removeAllRanges();
     }
-  };
-
-  const insertImage = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.style.display = 'none';
-    document.body.appendChild(fileInput);
-    
-    fileInput.addEventListener('change', function() {
-      if (this.files && this.files[0]) {
-        const file = this.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          const img = document.createElement('img');
-          img.src = e.target?.result as string;
-          img.className = 'inserted-image animate-in';
-          img.style.maxWidth = '100%';
-          
-          const selection = window.getSelection();
-          if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(img);
-          }
-        };
-        
-        reader.readAsDataURL(file);
-      }
-      
-      document.body.removeChild(fileInput);
-    });
-    
-    fileInput.click();
   };
 
   const handleAttachment = () => {
@@ -300,7 +250,6 @@ export const TextEditor = () => {
         toggleDropdown={toggleDropdown}
         insertCodeBlock={insertCodeBlock}
         insertEquation={insertEquation}
-        insertImage={insertImage}
         handleAttachment={handleAttachment}
         insertDivider={insertDivider}
         onParagraphStyle={handleParagraphStyle}

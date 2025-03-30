@@ -1,3 +1,4 @@
+
 .editor-container {
   width: 100%;
   max-width: 900px;
@@ -223,36 +224,99 @@
   border-color: #f1f3f4;
 }
 
-.color-preview, .highlight-preview {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  border: 1px solid #ccc;
-  display: inline-block;
+/* New Font Color Button Style */
+.text-color-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2px 4px;
+  gap: 0;
 }
 
-.highlight-preview {
-  background-color: #FFFF00;
+.text-color-icon {
+  font-size: 14px;
+  font-weight: bold;
 }
 
-.font-size-option {
-  padding: 5px 10px;
+.color-bar {
+  height: 3px;
+  width: 100%;
+  margin-top: 1px;
+  border-radius: 1px;
+}
+
+/* Highlight button style */
+.highlight-btn {
+  padding: 2px 6px;
+}
+
+.highlight-icon svg {
+  stroke: #5f6368;
+}
+
+/* Number Input for Font Size */
+.number-input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.number-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background-color: #f1f3f4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.number-btn:hover {
+  background-color: #e8eaed;
+}
+
+.number-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.number-input {
+  width: 36px;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  outline: none;
+  padding: 0;
+  height: 24px;
+}
+
+.paragraph-style-menu {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  padding: 4px;
+  width: auto;
+}
+
+.paragraph-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
   border-radius: 4px;
-  min-width: 100px;
 }
 
-.font-size-option:hover {
+.paragraph-option:hover {
   background-color: #f1f3f4;
 }
 
-.color-preview {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: #000000;
-  border: 1px solid #ccc;
-  display: inline-block;
+.font-size-container {
+  padding: 2px;
 }
 
 .attachment {
@@ -279,7 +343,13 @@
   margin: 16px 0;
 }
 
-.math-icon, .quote-icon, .divider-icon {
+.math-icon {
+  font-family: serif;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.quote-icon, .divider-icon {
   font-family: serif;
   font-weight: bold;
   font-size: 16px;
