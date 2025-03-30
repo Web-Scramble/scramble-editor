@@ -11,58 +11,91 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
     
     useEffect(() => {
       if (contentRef.current) {
-        // Initialize with minimal content for a better editing experience
+        // Initialize with some content that demonstrates the rich text features
         contentRef.current.innerHTML = `
-          <p>Start typing here...</p>
+          <h1>Rich Text Editor Demo</h1>
+          
+          <p>This is a <strong>rich text editor</strong> with support for <em>various</em> <u>formatting</u> options.</p>
+          
+          <p>You can create lists:</p>
+          <ul>
+            <li>Bullet point 1</li>
+            <li>Bullet point 2</li>
+            <li>Bullet point 3</li>
+          </ul>
+          
+          <p>Or numbered lists:</p>
+          <ol>
+            <li>First item</li>
+            <li>Second item</li>
+            <li>Third item</li>
+          </ol>
+          
+          <p style="color: #0066cc;">You can change text color</p>
+          <p><span style="background-color: #FFFF00;">And highlight text</span> for emphasis.</p>
+          
+          <div class="code-block">// Example code block
+function calculateQuadratic(a, b, c) {
+    const discriminant = b*b - 4*a*c;
+    if (discriminant < 0) return "No real solutions";
+    
+    const x1 = (-b + Math.sqrt(discriminant)) / (2*a);
+    const x2 = (-b - Math.sqrt(discriminant)) / (2*a);
+    return [x1, x2];
+}</div>
+          
+          <p>You can add LaTeX equations like this:</p>
+          
+          <div class="equation equation-rendered">$\\int_{a}^{b} f(x) \\, dx$</div>
+          
+          <p>Double-click the equation to edit it in LaTeX format.</p>
+          
+          <hr class="editor-divider">
+          
+          <p>Use the toolbar above to format your text, add code blocks, equations, and more!</p>
         `;
         
-        // Setup equation handlers
-        contentRef.current.addEventListener('dblclick', (e) => {
-          const target = e.target as HTMLElement;
-          if (target.classList.contains('equation')) {
-            // Make the equation editable on double click
-            const range = document.createRange();
-            range.selectNodeContents(target);
-            const selection = window.getSelection();
-            if (selection) {
-              selection.removeAllRanges();
-              selection.addRange(range);
-            }
-            target.classList.remove('equation-rendered');
-          }
-        });
+        // Setup event listeners for equations
+        setupEquationHandlers();
         
-        // Add blur event for equations
-        contentRef.current.addEventListener('focusout', (e) => {
-          const target = e.target as HTMLElement;
-          if (target.classList.contains('equation') || target.closest('.equation')) {
-            const equation = target.classList.contains('equation') ? target : target.closest('.equation');
-            if (equation) {
-              equation.classList.add('equation-rendered');
-            }
-          }
-        });
-
-        // Place cursor at the beginning
-        const selection = window.getSelection();
-        if (selection) {
-          const range = document.createRange();
-          const firstParagraph = contentRef.current.querySelector('p');
-          if (firstParagraph) {
-            range.setStart(firstParagraph, 0);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            contentRef.current.focus();
-          }
-        }
+        // Make the editor editable correctly
+        contentRef.current.setAttribute('contenteditable', 'true');
       }
     }, []);
+    
+    // Setup equation handlers for double-click editing
+    const setupEquationHandlers = () => {
+      if (!contentRef.current) return;
+      
+      // Find all equations in the content
+      const equations = contentRef.current.querySelectorAll('.equation');
+      
+      equations.forEach(equation => {
+        // Double click to edit
+        equation.addEventListener('dblclick', function() {
+          // Place cursor inside the equation for easy editing
+          const range = document.createRange();
+          range.selectNodeContents(equation);
+          const selection = window.getSelection();
+          if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+          equation.classList.remove('equation-rendered');
+        });
+        
+        // Blur event to render the equation
+        equation.addEventListener('blur', function() {
+          equation.classList.add('equation-rendered');
+        });
+      });
+    };
 
     // Apply focus styles
     const handleFocus = () => {
       if (contentRef.current) {
         contentRef.current.style.boxShadow = '0 0 0 2px rgba(66, 133, 244, 0.2)';
+        contentRef.current.style.transition = 'box-shadow 0.2s ease';
       }
     };
 
@@ -73,9 +106,19 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
       }
     };
     
+    // Ensure command execution works properly by capturing keydown events
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      // Add any special key handling if needed
+      // For example, tab inserts a tab character instead of moving focus
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
+      }
+    };
+    
     return (
       <div 
-        className="content-area p-4 min-h-[300px] outline-none"
+        className="content-area" 
         contentEditable={true}
         ref={(node) => {
           // Handle both the forwardRef and our local ref
@@ -89,12 +132,7 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
         suppressContentEditableWarning={true}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        style={{ 
-          minHeight: '300px', 
-          lineHeight: '1.5',
-          fontSize: '16px',
-          color: '#333'
-        }}
+        onKeyDown={handleKeyDown}
       />
     );
   }

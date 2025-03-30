@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface NumberInputProps {
   initialValue: number;
@@ -17,11 +17,6 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   onChange 
 }) => {
   const [value, setValue] = useState(initialValue);
-
-  // Update local state when initialValue prop changes
-  useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value, 10);
@@ -45,27 +40,25 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   };
 
   return (
-    <div className="flex items-center h-8 border border-gray-300 rounded bg-white">
+    <div className="number-input-container">
       <button 
-        className="px-2 h-full text-gray-600 hover:bg-gray-100 border-r border-gray-300"
+        className="number-btn decrement"
         onClick={handleDecrement}
         disabled={value <= min}
-        aria-label="Decrease"
       >
         −
       </button>
       <input
         type="text"
-        className="w-10 h-full text-center focus:outline-none"
+        className="number-input"
         value={value}
         onChange={handleChange}
         aria-label="Font size"
       />
       <button 
-        className="px-2 h-full text-gray-600 hover:bg-gray-100 border-l border-gray-300"
+        className="number-btn increment"
         onClick={handleIncrement}
         disabled={value >= max}
-        aria-label="Increase"
       >
         +
       </button>
