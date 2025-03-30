@@ -4,7 +4,7 @@ import {
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
   Code, Link2, List, ListOrdered, Table, Paperclip,
-  Smile, Undo, Redo
+  Smile, Undo, Redo, ChevronDown
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { NumberInput } from './NumberInput';
@@ -21,17 +21,19 @@ interface ToolbarProps {
     showFontSizePicker: boolean;
     showEmojiPicker: boolean;
     showParagraphStyleMenu: boolean;
+    showTextStyleMenu: boolean;
   };
   onColorChange: (color: string) => void;
   onHighlightChange: (color: string) => void;
   onFontSizeChange: (size: number) => void;
   onEmojiSelect: (emoji: string) => void;
-  toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => void;
+  toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle' | 'textStyle', e: React.MouseEvent) => void;
   insertCodeBlock: () => void;
   insertEquation: () => void;
   handleAttachment: () => void;
   insertDivider: () => void;
   onParagraphStyle: (command: string) => void;
+  onTextStyle: (command: string) => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -46,7 +48,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   insertEquation,
   handleAttachment,
   insertDivider,
-  onParagraphStyle
+  onParagraphStyle,
+  onTextStyle
 }) => {
   const handleButtonClick = (e: React.MouseEvent, command: string, value: any = null) => {
     e.preventDefault();
@@ -71,15 +74,33 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <button 
             className="dropdown-btn" 
             title="Text Style"
-            onClick={(e) => {
-              // This would implement text style functionality
-              // For now we'll just have a placeholder button
-              e.preventDefault();
-            }}
+            onClick={(e) => toggleDropdown('textStyle', e)}
           >
             Normal text
-            <span className="arrow">▼</span>
+            <ChevronDown size={12} className="ml-1" />
           </button>
+          {editorState.showTextStyleMenu && (
+            <div className="text-style-menu">
+              <div className="text-style-option" onClick={() => onTextStyle('formatBlock,<p>')}>
+                <p className="text-sm">Normal text</p>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('formatBlock,<h1>')}>
+                <h1 className="text-xl font-bold">Heading 1</h1>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('formatBlock,<h2>')}>
+                <h2 className="text-lg font-bold">Heading 2</h2>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('formatBlock,<h3>')}>
+                <h3 className="text-base font-bold">Heading 3</h3>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('formatBlock,<h4>')}>
+                <h4 className="text-sm font-bold">Heading 4</h4>
+              </div>
+              <div className="text-style-option" onClick={() => onTextStyle('formatBlock,<pre>')}>
+                <pre className="text-xs">Preformatted</pre>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -93,7 +114,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onClick={(e) => toggleDropdown('paragraphStyle', e)}
           >
             <AlignLeft size={16} />
-            <span className="arrow">▼</span>
+            <ChevronDown size={12} className="ml-1" />
           </button>
           {editorState.showParagraphStyleMenu && (
             <div className="paragraph-style-menu">

@@ -15,15 +15,17 @@ interface EmojiPickerProps {
 export const EmojiPicker: React.FC<EmojiPickerProps> = ({ onSelect }) => {
   return (
     <div className="emoji-picker">
-      {EMOJIS.map((emoji) => (
-        <div
-          key={emoji}
-          className="emoji-option"
-          onClick={() => onSelect(emoji)}
-        >
-          {emoji}
-        </div>
-      ))}
+      <div className="emoji-grid">
+        {EMOJIS.map((emoji) => (
+          <div
+            key={emoji}
+            className="emoji-option"
+            onClick={() => onSelect(emoji)}
+          >
+            {emoji}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -14,6 +14,7 @@ export const TextEditor = () => {
     showFontSizePicker: false,
     showEmojiPicker: false,
     showParagraphStyleMenu: false,
+    showTextStyleMenu: false,
   });
   
   const contentRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,8 @@ export const TextEditor = () => {
         showHighlightPicker: false,
         showFontSizePicker: false,
         showEmojiPicker: false,
-        showParagraphStyleMenu: false
+        showParagraphStyleMenu: false,
+        showTextStyleMenu: false
       }));
     };
 
@@ -97,7 +99,7 @@ export const TextEditor = () => {
     }
   };
 
-  const toggleDropdown = (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => {
+  const toggleDropdown = (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle' | 'textStyle', e: React.MouseEvent) => {
     e.stopPropagation();
     const updatedState = {
       ...editorState,
@@ -106,6 +108,7 @@ export const TextEditor = () => {
       showFontSizePicker: dropdown === 'fontSize' ? !editorState.showFontSizePicker : false,
       showEmojiPicker: dropdown === 'emoji' ? !editorState.showEmojiPicker : false,
       showParagraphStyleMenu: dropdown === 'paragraphStyle' ? !editorState.showParagraphStyleMenu : false,
+      showTextStyleMenu: dropdown === 'textStyle' ? !editorState.showTextStyleMenu : false,
     };
     setEditorState(updatedState);
   };
@@ -244,6 +247,14 @@ export const TextEditor = () => {
       showParagraphStyleMenu: false
     });
   };
+  
+  const handleTextStyle = (command: string) => {
+    execCommand(command);
+    setEditorState({
+      ...editorState,
+      showTextStyleMenu: false
+    });
+  };
 
   return (
     <div className="editor-container animate-in">
@@ -260,6 +271,7 @@ export const TextEditor = () => {
         handleAttachment={handleAttachment}
         insertDivider={insertDivider}
         onParagraphStyle={handleParagraphStyle}
+        onTextStyle={handleTextStyle}
       />
       <ContentArea ref={contentRef} />
     </div>
