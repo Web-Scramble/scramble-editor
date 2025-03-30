@@ -36,30 +36,32 @@ interface ColorPickerProps {
 
 export const ColorPicker: React.FC<ColorPickerProps> = ({ onSelect, type }) => {
   return (
-    <div className="color-picker">
-      <div className="color-grid">
+    <div className="color-picker bg-white border border-gray-200 rounded shadow-lg p-2 w-64">
+      <div className="color-grid grid grid-cols-8 gap-1">
         {COLORS.map((color) => (
           <div
             key={`${type}-${color}`}
-            className="color-option"
+            className="color-option w-6 h-6 rounded cursor-pointer hover:scale-110 transition-transform"
             style={{ 
               backgroundColor: color, 
-              border: color === '#FFFFFF' ? '1px solid #ccc' : 'none' 
+              border: color === '#FFFFFF' ? '1px solid #ddd' : 'none',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
             }}
             onClick={() => onSelect(color)}
             data-color={color}
+            title={color}
           />
         ))}
       </div>
-      <div className="color-footer">
-        <div className="custom-color">CUSTOM</div>
-        <div className="color-tools">
-          <button className="color-tool">
-            <span className="plus-icon">+</span>
+      <div className="color-footer flex justify-between items-center mt-2 border-t border-gray-200 pt-2">
+        <div className="custom-color text-xs text-gray-500">CUSTOM</div>
+        <div className="color-tools flex gap-1">
+          <button className="color-tool p-1 rounded hover:bg-gray-100">
+            <span className="plus-icon text-sm">+</span>
           </button>
-          <button className="color-tool">
+          <button className="color-tool p-1 rounded hover:bg-gray-100">
             <span className="dropper-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 16l4-4-8-8-4 4" />
                 <path d="M10 10l-8 8 4 4 8-8" />
               </svg>
