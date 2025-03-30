@@ -163,10 +163,18 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       <div className="toolbar-divider"></div>
 
       <div className="toolbar-group">
-        <button className="btn" title="Bullet List" onClick={(e) => handleButtonClick(e, 'insertUnorderedList')}>
+        <button 
+          className="btn" 
+          title="Bullet List" 
+          onClick={(e) => handleButtonClick(e, 'insertUnorderedList')}
+        >
           <List size={16} />
         </button>
-        <button className="btn" title="Numbered List" onClick={(e) => handleButtonClick(e, 'insertOrderedList')}>
+        <button 
+          className="btn" 
+          title="Numbered List" 
+          onClick={(e) => handleButtonClick(e, 'insertOrderedList')}
+        >
           <ListOrdered size={16} />
         </button>
       </div>

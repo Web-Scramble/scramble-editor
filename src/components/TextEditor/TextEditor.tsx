@@ -62,7 +62,12 @@ export const TextEditor = () => {
       currentColor: color,
       showColorPicker: false
     });
-    execCommand('foreColor', false, color);
+    
+    // Ensure we have selection before applying the color
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      execCommand('foreColor', false, color);
+    }
   };
 
   const handleHighlightChange = (color: string) => {
@@ -71,7 +76,12 @@ export const TextEditor = () => {
       currentHighlightColor: color,
       showHighlightPicker: false
     });
-    execCommand('hiliteColor', false, color);
+    
+    // Ensure we have selection before applying the highlight
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      execCommand('hiliteColor', false, color);
+    }
   };
 
   const handleFontSizeChange = (size: number) => {
@@ -82,14 +92,17 @@ export const TextEditor = () => {
       showFontSizePicker: false
     });
     
-    // The fontSize command uses values 1-7, but we want to use pixel values
-    // So we'll use a special approach to set font size
-    document.execCommand('fontSize', false, '7');
-    const selectedElements = document.querySelectorAll('font[size="7"]');
-    selectedElements.forEach(el => {
-      el.removeAttribute('size');
-      (el as HTMLElement).style.fontSize = sizeInPx;
-    });
+    // Get the current selection
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      // The fontSize command uses values 1-7, but we want to use pixel values
+      document.execCommand('fontSize', false, '7');
+      const selectedElements = document.querySelectorAll('font[size="7"]');
+      selectedElements.forEach(el => {
+        el.removeAttribute('size');
+        (el as HTMLElement).style.fontSize = sizeInPx;
+      });
+    }
   };
 
   const handleEmojiSelect = (emoji: string) => {
@@ -117,6 +130,8 @@ export const TextEditor = () => {
 
   const toggleDropdown = (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle' | 'textStyle', e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault(); // Prevent default to maintain focus
+    
     const updatedState = {
       ...editorState,
       showColorPicker: dropdown === 'color' ? !editorState.showColorPicker : false,
@@ -284,7 +299,14 @@ export const TextEditor = () => {
   };
 
   const handleParagraphStyle = (command: string) => {
+    // Make sure we have focus on the editor
+    if (contentRef.current) {
+      contentRef.current.focus();
+    }
+    
+    // Apply paragraph style
     execCommand(command);
+    
     setEditorState({
       ...editorState,
       showParagraphStyleMenu: false
@@ -292,8 +314,14 @@ export const TextEditor = () => {
   };
 
   const handleTextStyle = (tag: string) => {
+    // Make sure we have focus on the editor
+    if (contentRef.current) {
+      contentRef.current.focus();
+    }
+    
     // Format the current block with the specified tag
     execCommand('formatBlock', false, `<${tag}>`);
+    
     setEditorState({
       ...editorState,
       showTextStyleMenu: false
