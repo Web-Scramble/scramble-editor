@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
@@ -19,7 +18,6 @@ export const TextEditor = () => {
     showTextStyleMenu: false,
   });
   
-  // Add state for mobile tabs
   const [activeTab, setActiveTab] = useState('format');
   const isMobile = useIsMobile();
   
@@ -37,16 +35,7 @@ export const TextEditor = () => {
       if ((event.target as Element)?.closest('.dropdown, .dropdown-btn')) {
         return;
       }
-      
-      setEditorState(prev => ({
-        ...prev,
-        showColorPicker: false,
-        showHighlightPicker: false,
-        showFontSizePicker: false,
-        showEmojiPicker: false,
-        showParagraphStyleMenu: false,
-        showTextStyleMenu: false
-      }));
+      closeAllDropdowns();
     };
 
     document.addEventListener('click', handleClickOutside);
@@ -54,6 +43,24 @@ export const TextEditor = () => {
       document.removeEventListener('click', handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      closeAllDropdowns();
+    }
+  }, [activeTab, isMobile]);
+
+  const closeAllDropdowns = () => {
+    setEditorState(prev => ({
+      ...prev,
+      showColorPicker: false,
+      showHighlightPicker: false,
+      showFontSizePicker: false,
+      showEmojiPicker: false,
+      showParagraphStyleMenu: false,
+      showTextStyleMenu: false
+    }));
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -323,6 +330,16 @@ export const TextEditor = () => {
           className="drag-handle" 
           ref={dragHandleRef}
           onMouseDown={handleDragStart}
+          onTouchStart={(e) => {
+            const touch = e.touches[0];
+            const target = e.currentTarget;
+            const rect = target.getBoundingClientRect();
+            setIsDragging(true);
+            setDragOffset({
+              x: touch.clientX - rect.left,
+              y: touch.clientY - rect.top
+            });
+          }}
         >
           <GripVertical size={16} />
           <div className="drag-handle-text">
