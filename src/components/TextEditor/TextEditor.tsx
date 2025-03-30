@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
@@ -11,13 +11,34 @@ export const TextEditor = () => {
     showColorPicker: false,
     showFontSizePicker: false,
     showEmojiPicker: false,
+    showParagraphStyleMenu: false,
   });
   
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const execCommand = (command: string, showUI = false, value = null) => {
+  useEffect(() => {
+    // Close dropdowns when clicking outside
+    const handleClickOutside = () => {
+      setEditorState(prev => ({
+        ...prev,
+        showColorPicker: false,
+        showFontSizePicker: false,
+        showEmojiPicker: false,
+        showParagraphStyleMenu: false
+      }));
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  const execCommand = (command: string, showUI = false, value: any = null) => {
     document.execCommand(command, showUI, value);
-    contentRef.current?.focus();
+    if (contentRef.current) {
+      contentRef.current.focus();
+    }
   };
 
   const handleColorChange = (color: string) => {
@@ -57,12 +78,14 @@ export const TextEditor = () => {
     }
   };
 
-  const toggleDropdown = (dropdown: 'color' | 'fontSize' | 'emoji') => {
+  const toggleDropdown = (dropdown: 'color' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => {
+    e.stopPropagation();
     const updatedState = {
       ...editorState,
       showColorPicker: dropdown === 'color' ? !editorState.showColorPicker : false,
       showFontSizePicker: dropdown === 'fontSize' ? !editorState.showFontSizePicker : false,
-      showEmojiPicker: dropdown === 'emoji' ? !editorState.showEmojiPicker : false
+      showEmojiPicker: dropdown === 'emoji' ? !editorState.showEmojiPicker : false,
+      showParagraphStyleMenu: dropdown === 'paragraphStyle' ? !editorState.showParagraphStyleMenu : false,
     };
     setEditorState(updatedState);
   };
@@ -91,15 +114,43 @@ export const TextEditor = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-      const selectedText = range.toString() || 'E = mc²';
+      const selectedText = range.toString() || '\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}';
       
-      const equation = document.createElement('span');
+      // Create the equation container
+      const equation = document.createElement('div');
       equation.className = 'equation animate-in';
-      equation.textContent = selectedText;
+      
+      // Create the LaTeX markdown format
+      let latexContent = selectedText;
+      if (!latexContent.startsWith('$') && !latexContent.endsWith('$')) {
+        latexContent = '$' + latexContent + '$';
+      }
+      
+      equation.textContent = latexContent;
       equation.contentEditable = 'true';
+      equation.setAttribute('data-latex', 'true');
       
       range.deleteContents();
       range.insertNode(equation);
+      
+      // Setup equation for editing
+      equation.addEventListener('dblclick', function() {
+        // Place cursor inside the equation for easy editing
+        const range = document.createRange();
+        range.selectNodeContents(this);
+        const selection = window.getSelection();
+        if (selection) {
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+        equation.classList.remove('equation-rendered');
+      });
+      
+      // Add blur event to render the equation
+      equation.addEventListener('blur', function() {
+        // This is where we would render the LaTeX in a real implementation
+        equation.classList.add('equation-rendered');
+      });
       
       // Clear selection
       selection.removeAllRanges();
@@ -204,6 +255,14 @@ export const TextEditor = () => {
     }
   };
 
+  const handleParagraphStyle = (command: string) => {
+    execCommand(command);
+    setEditorState({
+      ...editorState,
+      showParagraphStyleMenu: false
+    });
+  };
+
   return (
     <div className="editor-container animate-in">
       <Toolbar 
@@ -218,6 +277,7 @@ export const TextEditor = () => {
         insertImage={insertImage}
         handleAttachment={handleAttachment}
         insertDivider={insertDivider}
+        onParagraphStyle={handleParagraphStyle}
       />
       <ContentArea ref={contentRef} />
     </div>

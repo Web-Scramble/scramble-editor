@@ -4,7 +4,7 @@ import {
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
   Code, Link2, List, ListOrdered, Image, Table, Paperclip,
-  Type, Smile, Undo, Redo
+  Type, Smile, Undo, Redo, FileText
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { FontSizePicker } from './FontSizePicker';
@@ -18,16 +18,18 @@ interface ToolbarProps {
     showColorPicker: boolean;
     showFontSizePicker: boolean;
     showEmojiPicker: boolean;
+    showParagraphStyleMenu: boolean;
   };
   onColorChange: (color: string) => void;
   onFontSizeChange: (size: string) => void;
   onEmojiSelect: (emoji: string) => void;
-  toggleDropdown: (dropdown: 'color' | 'fontSize' | 'emoji') => void;
+  toggleDropdown: (dropdown: 'color' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => void;
   insertCodeBlock: () => void;
   insertEquation: () => void;
   insertImage: () => void;
   handleAttachment: () => void;
   insertDivider: () => void;
+  onParagraphStyle: (command: string) => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -41,7 +43,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   insertEquation,
   insertImage,
   handleAttachment,
-  insertDivider
+  insertDivider,
+  onParagraphStyle
 }) => {
   const handleButtonClick = (e: React.MouseEvent, command: string, value: any = null) => {
     e.preventDefault();
@@ -74,10 +77,34 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
       <div className="toolbar-group">
         <div className="dropdown">
-          <button className="dropdown-btn" title="Paragraph Style">
-            <List size={16} />
+          <button 
+            className="dropdown-btn" 
+            title="Paragraph Style"
+            onClick={(e) => toggleDropdown('paragraphStyle', e)}
+          >
+            <FileText size={16} />
             <span className="arrow">▼</span>
           </button>
+          {editorState.showParagraphStyleMenu && (
+            <div className="paragraph-style-menu">
+              <div className="paragraph-option" onClick={() => onParagraphStyle('justifyLeft')}>
+                <AlignLeft size={16} />
+                <span>Align Left</span>
+              </div>
+              <div className="paragraph-option" onClick={() => onParagraphStyle('justifyCenter')}>
+                <AlignCenter size={16} />
+                <span>Align Center</span>
+              </div>
+              <div className="paragraph-option" onClick={() => onParagraphStyle('justifyRight')}>
+                <AlignRight size={16} />
+                <span>Align Right</span>
+              </div>
+              <div className="paragraph-option" onClick={() => onParagraphStyle('justifyFull')}>
+                <AlignJustify size={16} />
+                <span>Justify</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -95,23 +122,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </button>
         <button className="btn" title="Strikethrough" onClick={(e) => handleButtonClick(e, 'strikeThrough')}>
           <Strikethrough size={16} />
-        </button>
-      </div>
-
-      <div className="toolbar-divider"></div>
-
-      <div className="toolbar-group">
-        <button className="btn" title="Align Left" onClick={(e) => handleButtonClick(e, 'justifyLeft')}>
-          <AlignLeft size={16} />
-        </button>
-        <button className="btn" title="Align Center" onClick={(e) => handleButtonClick(e, 'justifyCenter')}>
-          <AlignCenter size={16} />
-        </button>
-        <button className="btn" title="Align Right" onClick={(e) => handleButtonClick(e, 'justifyRight')}>
-          <AlignRight size={16} />
-        </button>
-        <button className="btn" title="Justify" onClick={(e) => handleButtonClick(e, 'justifyFull')}>
-          <AlignJustify size={16} />
         </button>
       </div>
 
@@ -164,7 +174,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <button 
             className="dropdown-btn" 
             title="Font Size" 
-            onClick={() => toggleDropdown('fontSize')}
+            onClick={(e) => toggleDropdown('fontSize', e)}
           >
             <Type size={16} />
             <span className="arrow">▼</span>
@@ -178,7 +188,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <button 
             className="dropdown-btn" 
             title="Font Color"
-            onClick={() => toggleDropdown('color')}
+            onClick={(e) => toggleDropdown('color', e)}
           >
             <span 
               className="color-preview" 
@@ -195,7 +205,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <button 
             className="dropdown-btn" 
             title="Insert Emoji"
-            onClick={() => toggleDropdown('emoji')}
+            onClick={(e) => toggleDropdown('emoji', e)}
           >
             <Smile size={16} />
           </button>

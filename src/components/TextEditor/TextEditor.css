@@ -112,11 +112,11 @@
   border-radius: 4px;
   padding: 8px 12px;
   margin: 8px 0;
-  font-family: 'Georgia', serif;
-  font-style: italic;
+  font-family: 'Courier New', monospace;
   display: inline-block;
   border: 1px dashed #ccc;
   transition: all 0.2s ease;
+  white-space: pre-wrap;
 }
 
 .equation:hover {
@@ -124,7 +124,24 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.color-picker, .font-size-picker, .emoji-picker {
+.equation-preview {
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-family: 'Georgia', serif;
+  display: inline-block;
+  border: 1px solid #ccc;
+}
+
+.equation-rendered {
+  border-style: solid;
+  background-color: #fcfcfc;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+}
+
+.color-picker, .font-size-picker, .emoji-picker, .paragraph-style-menu {
   position: absolute;
   top: 100%;
   left: 0;
@@ -136,6 +153,23 @@
   z-index: 100;
   animation: fadeIn 0.2s ease-out;
   margin-top: 4px;
+}
+
+.paragraph-style-menu {
+  width: 180px;
+}
+
+.paragraph-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.paragraph-option:hover {
+  background-color: #f1f3f4;
 }
 
 .emoji-picker {
