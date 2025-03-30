@@ -5,7 +5,7 @@ import {
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
   Code, Link2, List, ListOrdered, Image, Table, Paperclip,
   Type, Smile, Undo, Redo, Heading1, Heading2, Heading3, 
-  Quote, Minus, File
+  Quote, Minus, File, ChevronDown
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { FontSizePicker } from './FontSizePicker';
@@ -70,6 +70,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     insertTable(tableRows, tableCols);
     setShowTableDialog(false);
   };
+  
+  // Helper function to prevent events from bubbling up
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <div className="toolbar">
@@ -93,10 +98,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           >
             <Type size={16} />
             <span className="dropdown-label">Normal text</span>
-            <span className="arrow">▼</span>
+            <ChevronDown size={12} className="dropdown-arrow" />
           </button>
           {editorState.showTextStylePicker && (
-            <div className="dropdown-menu text-style-picker">
+            <div className="dropdown-menu text-style-picker" onClick={stopPropagation}>
               <div className="dropdown-item" onClick={() => applyTextStyle('normal')}>
                 Normal text
               </div>
@@ -127,10 +132,10 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onClick={() => toggleDropdown('paragraphStyle')}
           >
             <List size={16} />
-            <span className="arrow">▼</span>
+            <ChevronDown size={12} className="dropdown-arrow" />
           </button>
           {editorState.showParagraphStylePicker && (
-            <div className="dropdown-menu paragraph-style-picker">
+            <div className="dropdown-menu paragraph-style-picker" onClick={stopPropagation}>
               <div className="dropdown-item" onClick={() => applyParagraphStyle('paragraph')}>
                 <File size={16} className="mr-2" /> Paragraph
               </div>
@@ -220,7 +225,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         >
           <Table size={16} />
           {showTableDialog && (
-            <div className="table-dialog">
+            <div className="table-dialog" onClick={stopPropagation}>
               <div className="table-dialog-header">Insert Table</div>
               <div className="table-dialog-content">
                 <div className="table-dialog-row">
@@ -276,7 +281,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             onClick={() => toggleDropdown('fontSize')}
           >
             <Type size={16} />
-            <span className="arrow">▼</span>
+            <ChevronDown size={12} className="dropdown-arrow" />
           </button>
           {editorState.showFontSizePicker && (
             <FontSizePicker onSelect={onFontSizeChange} />
@@ -293,7 +298,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               className="color-preview" 
               style={{ backgroundColor: editorState.currentColor }} 
             ></span>
-            <span className="arrow">▼</span>
+            <ChevronDown size={12} className="dropdown-arrow" />
           </button>
           {editorState.showColorPicker && (
             <ColorPicker onSelect={onColorChange} />

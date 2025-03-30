@@ -109,6 +109,35 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
       setTimeout(renderEquations, 100);
     };
 
+    // Handle key events for improved undo/redo within contentEditable
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      // Capture common keyboard shortcuts
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault(); // Prevent browser's default undo
+        if (e.shiftKey) {
+          // Redo (Ctrl+Shift+Z)
+          document.execCommand('redo', false);
+        } else {
+          // Undo (Ctrl+Z)
+          document.execCommand('undo', false);
+        }
+        if (props.onContentChange) {
+          props.onContentChange();
+        }
+        return;
+      }
+      
+      // Redo with Ctrl+Y as well
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        document.execCommand('redo', false);
+        if (props.onContentChange) {
+          props.onContentChange();
+        }
+        return;
+      }
+    };
+
     return (
       <div 
         className="content-area" 
@@ -119,6 +148,7 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
         onDoubleClick={handleDoubleClick}
         onBlur={handleBlur}
         onInput={handleInput}
+        onKeyDown={handleKeyDown}
       >
         <p>Start typing here...</p>
       </div>

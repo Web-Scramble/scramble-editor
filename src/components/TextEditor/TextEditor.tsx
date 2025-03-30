@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
+import { toast } from 'sonner';
 
 export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
@@ -20,6 +21,7 @@ export const TextEditor = () => {
   const [historyStates, setHistoryStates] = useState<string[]>([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
   const [isUndoRedo, setIsUndoRedo] = useState(false);
+  const [currentTextStyle, setCurrentTextStyle] = useState('Normal text');
 
   // Save initial state on mount
   useEffect(() => {
@@ -56,6 +58,7 @@ export const TextEditor = () => {
     }
   };
 
+  // Close all dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -87,12 +90,14 @@ export const TextEditor = () => {
     };
   }, [editorState]);
 
+  // Basic text formatting command execution
   const execCommand = (command: string, showUI = false, value = null) => {
     document.execCommand(command, showUI, value);
     contentRef.current?.focus();
     handleContentChange();
   };
 
+  // Color picker handling
   const handleColorChange = (color: string) => {
     setEditorState({
       ...editorState,
@@ -102,21 +107,26 @@ export const TextEditor = () => {
     execCommand('foreColor', false, color);
   };
 
+  // Font size handling
   const handleFontSizeChange = (size: string) => {
     setEditorState({
       ...editorState,
       currentFontSize: size,
       showFontSizePicker: false
     });
+    
+    // More reliable approach to apply font size
     document.execCommand('fontSize', false, '7');
     const selectedElements = document.querySelectorAll('font[size="7"]');
     selectedElements.forEach(el => {
       el.removeAttribute('size');
       (el as HTMLElement).style.fontSize = size;
     });
+    
     handleContentChange();
   };
 
+  // Emoji insertion
   const handleEmojiSelect = (emoji: string) => {
     setEditorState({
       ...editorState,
@@ -128,10 +138,18 @@ export const TextEditor = () => {
       const range = selection.getRangeAt(0);
       range.deleteContents();
       range.insertNode(document.createTextNode(emoji));
+      
+      // Move cursor after emoji
+      range.setStartAfter(range.endContainer);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
       handleContentChange();
     }
   };
 
+  // Toggle dropdown menus
   const toggleDropdown = (dropdown: 'color' | 'fontSize' | 'emoji' | 'textStyle' | 'paragraphStyle') => {
     const updatedState = {
       ...editorState,
@@ -144,47 +162,69 @@ export const TextEditor = () => {
     setEditorState(updatedState);
   };
 
+  // Apply text styles (headings, normal text, etc.)
   const applyTextStyle = (style: string) => {
     if (!contentRef.current) return;
+    
+    let displayName = 'Normal text';
     
     switch(style) {
       case 'normal':
         execCommand('formatBlock', false, 'p');
+        displayName = 'Normal text';
         break;
       case 'h1':
+        execCommand('formatBlock', false, 'h1');
+        displayName = 'Heading 1';
+        break;
       case 'h2':
+        execCommand('formatBlock', false, 'h2');
+        displayName = 'Heading 2';
+        break;
       case 'h3':
-      case 'h4':
-      case 'h5':
-      case 'h6':
-        execCommand('formatBlock', false, style);
+        execCommand('formatBlock', false, 'h3');
+        displayName = 'Heading 3';
         break;
       case 'pre':
         execCommand('formatBlock', false, 'pre');
+        displayName = 'Code';
         break;
+      default:
+        execCommand('formatBlock', false, 'p');
+        displayName = 'Normal text';
     }
     
+    setCurrentTextStyle(displayName);
     setEditorState({
       ...editorState,
       showTextStylePicker: false
     });
+    
+    toast(`Applied: ${displayName}`);
   };
 
+  // Apply paragraph styles (lists, blockquotes)
   const applyParagraphStyle = (style: string) => {
     if (!contentRef.current) return;
+    
+    let displayName = '';
     
     switch(style) {
       case 'paragraph':
         execCommand('formatBlock', false, 'p');
+        displayName = 'Paragraph';
         break;
       case 'blockquote':
         execCommand('formatBlock', false, 'blockquote');
+        displayName = 'Blockquote';
         break;
       case 'ul':
         execCommand('insertUnorderedList', false, null);
+        displayName = 'Bullet List';
         break;
       case 'ol':
         execCommand('insertOrderedList', false, null);
+        displayName = 'Numbered List';
         break;
     }
     
@@ -192,8 +232,11 @@ export const TextEditor = () => {
       ...editorState,
       showParagraphStylePicker: false
     });
+    
+    toast(`Applied: ${displayName}`);
   };
 
+  // Insert code block
   const insertCodeBlock = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
@@ -223,9 +266,11 @@ export const TextEditor = () => {
       }
       
       handleContentChange();
+      toast('Code block inserted');
     }
   };
 
+  // Insert LaTeX equation
   const insertEquation = () => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
@@ -252,9 +297,11 @@ export const TextEditor = () => {
       selection.addRange(range);
       
       handleContentChange();
+      toast('LaTeX equation inserted - use $ delimiters for inline math, $$ for display math');
     }
   };
 
+  // Insert image
   const insertImage = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -279,6 +326,7 @@ export const TextEditor = () => {
             range.deleteContents();
             range.insertNode(img);
             handleContentChange();
+            toast('Image inserted');
           }
         };
         
@@ -291,6 +339,7 @@ export const TextEditor = () => {
     fileInput.click();
   };
 
+  // Handle file attachment
   const handleAttachment = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -323,6 +372,7 @@ export const TextEditor = () => {
           range.deleteContents();
           range.insertNode(attachment);
           handleContentChange();
+          toast(`File attached: ${fileName}`);
         }
       }
       
@@ -332,6 +382,7 @@ export const TextEditor = () => {
     fileInput.click();
   };
 
+  // Insert horizontal divider
   const insertDivider = () => {
     const hr = document.createElement('hr');
     hr.className = 'editor-divider animate-in';
@@ -352,9 +403,11 @@ export const TextEditor = () => {
       selection.addRange(newRange);
       
       handleContentChange();
+      toast('Divider inserted');
     }
   };
 
+  // Insert table with user-defined dimensions
   const insertTable = (rows: number, cols: number) => {
     if (!contentRef.current) return;
     
@@ -364,9 +417,26 @@ export const TextEditor = () => {
     table.style.borderCollapse = 'collapse';
     table.style.marginBottom = '1em';
     
+    // Add header row
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    for (let j = 0; j < cols; j++) {
+      const th = document.createElement('th');
+      th.style.border = '1px solid #ccc';
+      th.style.padding = '8px';
+      th.style.backgroundColor = '#f3f3f3';
+      th.appendChild(document.createElement('br'));
+      headerRow.appendChild(th);
+    }
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Add body rows
     const tbody = document.createElement('tbody');
     
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < rows - 1; i++) {
       const tr = document.createElement('tr');
       
       for (let j = 0; j < cols; j++) {
@@ -398,9 +468,11 @@ export const TextEditor = () => {
       }
       
       handleContentChange();
+      toast(`Table created with ${rows} rows and ${cols} columns`);
     }
   };
 
+  // Enhanced undo function
   const handleUndo = () => {
     if (currentHistoryIndex > 0) {
       setIsUndoRedo(true);
@@ -409,10 +481,16 @@ export const TextEditor = () => {
       
       if (contentRef.current && historyStates[newIndex]) {
         contentRef.current.innerHTML = historyStates[newIndex];
+        toast('Undo');
       }
+    } else {
+      toast('Nothing to undo', {
+        className: 'info-toast'
+      });
     }
   };
 
+  // Enhanced redo function
   const handleRedo = () => {
     if (currentHistoryIndex < historyStates.length - 1) {
       setIsUndoRedo(true);
@@ -421,7 +499,12 @@ export const TextEditor = () => {
       
       if (contentRef.current && historyStates[newIndex]) {
         contentRef.current.innerHTML = historyStates[newIndex];
+        toast('Redo');
       }
+    } else {
+      toast('Nothing to redo', {
+        className: 'info-toast'
+      });
     }
   };
 
