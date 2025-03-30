@@ -81,15 +81,6 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
       }
     };
 
-    // Make tables editable on click
-    const handleTableClick = (e: React.MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'TD' || target.tagName === 'TH') {
-        target.setAttribute('contenteditable', 'true');
-        target.focus();
-      }
-    };
-
     // Handle equation blur to render LaTeX
     const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
       const target = e.target as HTMLElement;
@@ -158,7 +149,6 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
         onBlur={handleBlur}
         onInput={handleInput}
         onKeyDown={handleKeyDown}
-        onMouseUp={handleTableClick}
       >
         <p>Start typing here...</p>
       </div>
