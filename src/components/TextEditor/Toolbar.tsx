@@ -24,7 +24,7 @@ interface ToolbarProps {
   };
   onColorChange: (color: string) => void;
   onHighlightChange: (color: string) => void;
-  onFontSizeChange: (size: string) => void;
+  onFontSizeChange: (size: number) => void;
   onEmojiSelect: (emoji: string) => void;
   toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle', e: React.MouseEvent) => void;
   insertCodeBlock: () => void;
@@ -53,10 +53,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     execCommand(command, false, value);
   };
 
-  const handleFontSizeChange = (size: number) => {
-    onFontSizeChange(`${size}px`);
-  };
-
   return (
     <div className="toolbar">
       <div className="toolbar-group">
@@ -72,7 +68,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
       <div className="toolbar-group">
         <div className="dropdown">
-          <button className="dropdown-btn" title="Text Style">
+          <button 
+            className="dropdown-btn" 
+            title="Text Style"
+            onClick={(e) => {
+              // This would implement text style functionality
+              // For now we'll just have a placeholder button
+              e.preventDefault();
+            }}
+          >
             Normal text
             <span className="arrow">▼</span>
           </button>
@@ -168,7 +172,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
       <div className="toolbar-group">
         <div className="dropdown" id="font-size-dropdown">
           <div className="font-size-container">
-            <NumberInput initialValue={16} min={8} max={96} onChange={handleFontSizeChange} />
+            <NumberInput initialValue={16} min={8} max={96} onChange={onFontSizeChange} />
           </div>
         </div>
         

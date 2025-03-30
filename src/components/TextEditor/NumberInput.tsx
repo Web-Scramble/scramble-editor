@@ -53,6 +53,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
         className="number-input"
         value={value}
         onChange={handleChange}
+        aria-label="Font size"
       />
       <button 
         className="number-btn increment"

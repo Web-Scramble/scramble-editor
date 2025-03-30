@@ -20,7 +20,12 @@ export const TextEditor = () => {
 
   useEffect(() => {
     // Close dropdowns when clicking outside
-    const handleClickOutside = () => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Don't close if clicking inside a dropdown or button
+      if ((event.target as Element)?.closest('.dropdown, .dropdown-btn')) {
+        return;
+      }
+      
       setEditorState(prev => ({
         ...prev,
         showColorPicker: false,
@@ -62,17 +67,19 @@ export const TextEditor = () => {
     execCommand('hiliteColor', false, color);
   };
 
-  const handleFontSizeChange = (size: string) => {
+  const handleFontSizeChange = (size: number) => {
+    const sizeInPx = `${size}px`;
     setEditorState({
       ...editorState,
-      currentFontSize: size,
+      currentFontSize: sizeInPx,
       showFontSizePicker: false
     });
+    
     document.execCommand('fontSize', false, '7');
     const selectedElements = document.querySelectorAll('font[size="7"]');
     selectedElements.forEach(el => {
       el.removeAttribute('size');
-      (el as HTMLElement).style.fontSize = size;
+      (el as HTMLElement).style.fontSize = sizeInPx;
     });
   };
 

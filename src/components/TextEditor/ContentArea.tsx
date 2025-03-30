@@ -11,9 +11,28 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
     
     useEffect(() => {
       if (contentRef.current) {
-        // Initialize with some content
+        // Initialize with some content that demonstrates the rich text features
         contentRef.current.innerHTML = `
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis lobortis nisl cursus bibendum sit nulla accumsan sodales ornare.</p>
+          <h1>Rich Text Editor Demo</h1>
+          
+          <p>This is a <strong>rich text editor</strong> with support for <em>various</em> <u>formatting</u> options.</p>
+          
+          <p>You can create lists:</p>
+          <ul>
+            <li>Bullet point 1</li>
+            <li>Bullet point 2</li>
+            <li>Bullet point 3</li>
+          </ul>
+          
+          <p>Or numbered lists:</p>
+          <ol>
+            <li>First item</li>
+            <li>Second item</li>
+            <li>Third item</li>
+          </ol>
+          
+          <p style="color: #0066cc;">You can change text color</p>
+          <p><span style="background-color: #FFFF00;">And highlight text</span> for emphasis.</p>
           
           <div class="code-block">// Example code block
 function calculateQuadratic(a, b, c) {
@@ -25,11 +44,15 @@ function calculateQuadratic(a, b, c) {
     return [x1, x2];
 }</div>
           
-          <p>You can now add LaTeX equations like this:</p>
+          <p>You can add LaTeX equations like this:</p>
           
           <div class="equation equation-rendered">$\\int_{a}^{b} f(x) \\, dx$</div>
           
           <p>Double-click the equation to edit it in LaTeX format.</p>
+          
+          <hr class="editor-divider">
+          
+          <p>Use the toolbar above to format your text, add code blocks, equations, and more!</p>
         `;
         
         // Setup event listeners for equations
