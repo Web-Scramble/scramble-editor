@@ -1,5 +1,12 @@
 
 import React, { forwardRef, useEffect, useRef } from 'react';
+import { Trash, Edit, Crop } from 'lucide-react';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
 
 interface ContentAreaProps {
   // Any props can be added here if needed
@@ -60,6 +67,15 @@ function calculateQuadratic(a, b, c) {
               <button class="media-control-btn" data-action="align-left">◀</button>
               <button class="media-control-btn" data-action="align-center">■</button>
               <button class="media-control-btn" data-action="align-right">▶</button>
+              <button class="media-control-btn media-delete-btn" data-action="delete">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+              </button>
+              <button class="media-control-btn media-edit-btn" data-action="edit">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>
+              </button>
+              <button class="media-control-btn media-crop-btn" data-action="crop">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>
+              </button>
             </div>
           </div>
           
@@ -164,25 +180,36 @@ function calculateQuadratic(a, b, c) {
             
             switch(action) {
               case 'resize-small':
-                container.style.width = '25%';
+                (container as HTMLElement).style.width = '25%';
                 break;
               case 'resize-medium':
-                container.style.width = '50%';
+                (container as HTMLElement).style.width = '50%';
                 break;
               case 'resize-large':
-                container.style.width = '100%';
+                (container as HTMLElement).style.width = '100%';
                 break;
               case 'align-left':
-                container.style.marginLeft = '0';
-                container.style.marginRight = 'auto';
+                (container as HTMLElement).style.marginLeft = '0';
+                (container as HTMLElement).style.marginRight = 'auto';
                 break;
               case 'align-center':
-                container.style.marginLeft = 'auto';
-                container.style.marginRight = 'auto';
+                (container as HTMLElement).style.marginLeft = 'auto';
+                (container as HTMLElement).style.marginRight = 'auto';
                 break;
               case 'align-right':
-                container.style.marginLeft = 'auto';
-                container.style.marginRight = '0';
+                (container as HTMLElement).style.marginLeft = 'auto';
+                (container as HTMLElement).style.marginRight = '0';
+                break;
+              case 'delete':
+                if (confirm('Are you sure you want to delete this media?')) {
+                  container.remove();
+                }
+                break;
+              case 'edit':
+                alert('Edit functionality will be implemented based on your requirements. Currently supports resize and alignment.');
+                break;
+              case 'crop':
+                alert('Crop functionality will be implemented based on your specific requirements.');
                 break;
             }
           });
@@ -196,6 +223,25 @@ function calculateQuadratic(a, b, c) {
             container.classList.remove('media-active');
           });
         }
+      });
+
+      // Set up context menu for right-click actions on media
+      setupMediaContextMenu();
+    };
+
+    const setupMediaContextMenu = () => {
+      if (!contentRef.current) return;
+      
+      // Add context menu triggers to all media containers
+      const mediaElements = contentRef.current.querySelectorAll('.editor-image, .editor-video');
+      
+      mediaElements.forEach(media => {
+        // Handle right click on media elements
+        media.addEventListener('contextmenu', (e) => {
+          // The context menu is handled by the ContextMenu component,
+          // but we can use this to prevent default browser context menu
+          e.preventDefault();
+        });
       });
     };
 

@@ -301,6 +301,22 @@ export const TextEditor = () => {
             rightBtn.textContent = '▶';
             rightBtn.dataset.action = 'align-right';
             
+            // Delete, Edit, and Crop buttons
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'media-control-btn media-delete-btn';
+            deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
+            deleteBtn.dataset.action = 'delete';
+            
+            const editBtn = document.createElement('button');
+            editBtn.className = 'media-control-btn media-edit-btn';
+            editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>';
+            editBtn.dataset.action = 'edit';
+            
+            const cropBtn = document.createElement('button');
+            cropBtn.className = 'media-control-btn media-crop-btn';
+            cropBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>';
+            cropBtn.dataset.action = 'crop';
+            
             // Add all buttons to controls
             controls.appendChild(smallBtn);
             controls.appendChild(mediumBtn);
@@ -308,6 +324,9 @@ export const TextEditor = () => {
             controls.appendChild(leftBtn);
             controls.appendChild(centerBtn);
             controls.appendChild(rightBtn);
+            controls.appendChild(deleteBtn);
+            controls.appendChild(editBtn);
+            controls.appendChild(cropBtn);
             
             imgContainer.appendChild(img);
             imgContainer.appendChild(controls);
@@ -363,6 +382,17 @@ export const TextEditor = () => {
                       imgContainer.style.marginLeft = 'auto';
                       imgContainer.style.marginRight = '0';
                       break;
+                    case 'delete':
+                      if (confirm('Are you sure you want to delete this image?')) {
+                        imgContainer.remove();
+                      }
+                      break;
+                    case 'edit':
+                      alert('Edit functionality will be implemented based on your requirements. Currently supports resize and alignment.');
+                      break;
+                    case 'crop':
+                      alert('Crop functionality will be implemented based on your specific requirements.');
+                      break;
                   }
                 });
               });
@@ -412,6 +442,7 @@ export const TextEditor = () => {
             const video = document.createElement('video');
             video.src = videoUrl;
             video.controls = true;
+            video.autoplay = false;
             video.className = 'editor-video';
             
             // Add media controls
@@ -450,6 +481,22 @@ export const TextEditor = () => {
             rightBtn.textContent = '▶';
             rightBtn.dataset.action = 'align-right';
             
+            // Delete, Edit, and Crop buttons
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'media-control-btn media-delete-btn';
+            deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
+            deleteBtn.dataset.action = 'delete';
+            
+            const editBtn = document.createElement('button');
+            editBtn.className = 'media-control-btn media-edit-btn';
+            editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>';
+            editBtn.dataset.action = 'edit';
+            
+            const cropBtn = document.createElement('button');
+            cropBtn.className = 'media-control-btn media-crop-btn';
+            cropBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>';
+            cropBtn.dataset.action = 'crop';
+            
             // Add all buttons to controls
             controls.appendChild(smallBtn);
             controls.appendChild(mediumBtn);
@@ -457,6 +504,9 @@ export const TextEditor = () => {
             controls.appendChild(leftBtn);
             controls.appendChild(centerBtn);
             controls.appendChild(rightBtn);
+            controls.appendChild(deleteBtn);
+            controls.appendChild(editBtn);
+            controls.appendChild(cropBtn);
             
             videoContainer.appendChild(video);
             videoContainer.appendChild(controls);
@@ -511,6 +561,17 @@ export const TextEditor = () => {
                     case 'align-right':
                       videoContainer.style.marginLeft = 'auto';
                       videoContainer.style.marginRight = '0';
+                      break;
+                    case 'delete':
+                      if (confirm('Are you sure you want to delete this video?')) {
+                        videoContainer.remove();
+                      }
+                      break;
+                    case 'edit':
+                      alert('Edit functionality will be implemented based on your requirements. Currently supports resize and alignment.');
+                      break;
+                    case 'crop':
+                      alert('Crop functionality will be implemented based on your specific requirements.');
                       break;
                   }
                 });
