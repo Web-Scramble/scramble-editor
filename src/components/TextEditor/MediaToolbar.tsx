@@ -75,7 +75,7 @@ export const MediaEditPanel: React.FC<{
   currentAlignment: 'left' | 'center' | 'right';
 }> = ({ onApply, onCancel, onAlignChange, currentAlignment }) => {
   return (
-    <div className="media-edit-panel absolute inset-0 bg-black/50 z-20 flex flex-col items-center justify-center">
+    <div className="media-edit-panel fixed inset-0 bg-black/50 z-20 flex flex-col items-center justify-center">
       <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md">
         <h3 className="text-lg font-medium mb-4">Edit Media</h3>
         <div className="cropper-container relative bg-gray-100 mb-4 aspect-video">

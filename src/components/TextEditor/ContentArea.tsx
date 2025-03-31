@@ -14,7 +14,10 @@ interface ResizeState {
   startY: number;
   startWidth: number;
   startHeight: number;
+  startLeft?: number;
+  startTop?: number;
   handle: string | null;
+  isPanning: boolean;
 }
 
 export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
@@ -28,7 +31,8 @@ export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
       startY: 0,
       startWidth: 0,
       startHeight: 0,
-      handle: null
+      handle: null,
+      isPanning: false
     });
     
     useEffect(() => {
@@ -94,28 +98,83 @@ function calculateQuadratic(a, b, c) {
     
     // Mouse move handler for resizing media elements
     const handleMouseMove = (e: MouseEvent) => {
-      if (!resizeState.isResizing || !resizeState.element || !resizeState.handle) return;
+      if (!resizeState.isResizing || !resizeState.element) return;
       
       e.preventDefault();
       
-      const mediaContent = resizeState.element.querySelector('.media-content');
+      const mediaContent = resizeState.element.querySelector('.media-content') as HTMLElement;
       if (!mediaContent) return;
       
       const dx = e.clientX - resizeState.startX;
       const dy = e.clientY - resizeState.startY;
       
+      // Handle panning (moving the crop overlay)
+      if (resizeState.isPanning) {
+        const cropOverlay = resizeState.element.querySelector('.crop-overlay') as HTMLElement;
+        if (cropOverlay && resizeState.startLeft !== undefined && resizeState.startTop !== undefined) {
+          const newLeft = Math.max(0, Math.min(100 - parseFloat(cropOverlay.style.width || '80'), resizeState.startLeft + dx * 100 / mediaContent.offsetWidth));
+          const newTop = Math.max(0, Math.min(100 - parseFloat(cropOverlay.style.height || '80'), resizeState.startTop + dy * 100 / mediaContent.offsetHeight));
+          
+          cropOverlay.style.left = `${newLeft}%`;
+          cropOverlay.style.top = `${newTop}%`;
+        }
+        return;
+      }
+      
+      // Handle resizing
       let newWidth = resizeState.startWidth;
       let newHeight = resizeState.startHeight;
       
       // Calculate new dimensions based on which handle is being dragged
-      if (resizeState.handle.includes('e')) {
-        newWidth = Math.max(100, resizeState.startWidth + dx);
-      }
-      if (resizeState.handle.includes('w')) {
-        newWidth = Math.max(100, resizeState.startWidth - dx);
+      if (resizeState.handle === null) {
+        // Direct resize of the media content
+        if (e.clientX > resizeState.startX) {
+          newWidth = Math.max(100, resizeState.startWidth + dx);
+        } else {
+          newWidth = Math.max(100, resizeState.startWidth - Math.abs(dx));
+        }
+      } else {
+        // Resize crop overlay
+        const cropOverlay = resizeState.element.querySelector('.crop-overlay') as HTMLElement;
+        if (cropOverlay) {
+          const containerWidth = mediaContent.offsetWidth;
+          const containerHeight = mediaContent.offsetHeight;
+          
+          if (resizeState.handle.includes('e')) {
+            const newWidthPercent = Math.max(10, Math.min(100, parseFloat(cropOverlay.style.width || '80') + dx * 100 / containerWidth));
+            cropOverlay.style.width = `${newWidthPercent}%`;
+          }
+          if (resizeState.handle.includes('w')) {
+            const currentWidth = parseFloat(cropOverlay.style.width || '80');
+            const currentLeft = parseFloat(cropOverlay.style.left || '10');
+            
+            const widthChange = dx * 100 / containerWidth;
+            const newWidthPercent = Math.max(10, Math.min(100 - currentLeft, currentWidth - widthChange));
+            const newLeftPercent = Math.max(0, Math.min(90, currentLeft + widthChange));
+            
+            cropOverlay.style.width = `${newWidthPercent}%`;
+            cropOverlay.style.left = `${newLeftPercent}%`;
+          }
+          if (resizeState.handle.includes('s')) {
+            const newHeightPercent = Math.max(10, Math.min(100, parseFloat(cropOverlay.style.height || '80') + dy * 100 / containerHeight));
+            cropOverlay.style.height = `${newHeightPercent}%`;
+          }
+          if (resizeState.handle.includes('n')) {
+            const currentHeight = parseFloat(cropOverlay.style.height || '80');
+            const currentTop = parseFloat(cropOverlay.style.top || '10');
+            
+            const heightChange = dy * 100 / containerHeight;
+            const newHeightPercent = Math.max(10, Math.min(100 - currentTop, currentHeight - heightChange));
+            const newTopPercent = Math.max(0, Math.min(90, currentTop + heightChange));
+            
+            cropOverlay.style.height = `${newHeightPercent}%`;
+            cropOverlay.style.top = `${newTopPercent}%`;
+          }
+          return;
+        }
       }
       
-      // Apply the new dimensions
+      // Apply the new dimensions to direct media resize
       mediaContent.style.width = `${newWidth}px`;
       if (newHeight > 0) {
         mediaContent.style.height = `${newHeight}px`;
@@ -132,8 +191,12 @@ function calculateQuadratic(a, b, c) {
           startY: 0,
           startWidth: 0,
           startHeight: 0,
-          handle: null
+          handle: null,
+          isPanning: false
         });
+        
+        // Reset cursor style
+        document.body.style.cursor = '';
       }
     };
     
@@ -188,9 +251,6 @@ function calculateQuadratic(a, b, c) {
           const mediaElement = (e.target as HTMLElement).closest('.media-element') as HTMLElement;
           if (!mediaElement) return;
           
-          const mediaContent = mediaElement.querySelector('.media-content') as HTMLElement;
-          if (!mediaContent) return;
-          
           // Get handle position (nw, ne, sw, se)
           const handleClass = Array.from((e.target as HTMLElement).classList).find(cls => cls.startsWith('resize-handle-'));
           const handle = handleClass ? handleClass.replace('resize-handle-', '') : null;
@@ -200,11 +260,49 @@ function calculateQuadratic(a, b, c) {
             element: mediaElement,
             startX: e.clientX,
             startY: e.clientY,
-            startWidth: mediaContent.offsetWidth,
-            startHeight: mediaContent.offsetHeight,
-            handle
+            startWidth: 0, // Not needed for crop overlay resize
+            startHeight: 0, // Not needed for crop overlay resize
+            handle,
+            isPanning: false
           });
+          
+          // Set appropriate resize cursor
+          if (handle) {
+            document.body.style.cursor = `${handle}-resize`;
+          }
         });
+      });
+      
+      // Add panning ability for crop overlay
+      cropOverlay.addEventListener('mousedown', (e: MouseEvent) => {
+        // Only start panning if we're not on a resize handle
+        if (!(e.target as HTMLElement).classList.contains('resize-handle')) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const mediaElement = (e.target as HTMLElement).closest('.media-element') as HTMLElement;
+          if (!mediaElement) return;
+          
+          // Get current position
+          const left = parseFloat(cropOverlay.style.left || '10');
+          const top = parseFloat(cropOverlay.style.top || '10');
+          
+          setResizeState({
+            isResizing: true,
+            element: mediaElement,
+            startX: e.clientX,
+            startY: e.clientY,
+            startWidth: 0, // Not used for panning
+            startHeight: 0, // Not used for panning
+            startLeft: left,
+            startTop: top,
+            handle: null,
+            isPanning: true
+          });
+          
+          // Set move cursor
+          document.body.style.cursor = 'move';
+        }
       });
     };
     
@@ -212,7 +310,7 @@ function calculateQuadratic(a, b, c) {
     const setupMediaElementEventListeners = (element: HTMLElement) => {
       // Handle edit button click
       element.addEventListener('click', (e) => {
-        const editButton = (e.target as HTMLElement).closest('.media-toolbar-btn[title^="Edit"]');
+        const editButton = (e.target as HTMLElement).closest('.media-toolbar-btn[title="Edit"]');
         if (editButton) {
           e.preventDefault();
           e.stopPropagation();
@@ -254,10 +352,16 @@ function calculateQuadratic(a, b, c) {
           const editPanel = element.querySelector('.media-edit-panel');
           if (editPanel) {
             editPanel.classList.remove('active');
-            toast({
-              title: "Changes applied",
-              description: "Media has been edited successfully",
-            });
+            
+            // Apply the crop/resize changes
+            const cropOverlay = editPanel.querySelector('.crop-overlay') as HTMLElement;
+            if (cropOverlay) {
+              // Here you would apply the actual crop/resize - for demo purposes we just show a toast
+              toast({
+                title: "Changes applied",
+                description: "Media has been edited successfully",
+              });
+            }
           }
         }
       });
@@ -269,22 +373,30 @@ function calculateQuadratic(a, b, c) {
           e.preventDefault();
           e.stopPropagation();
           
-          // Cycle through alignment classes
-          if (element.classList.contains('media-align-left')) {
-            element.classList.remove('media-align-left');
-            element.classList.add('media-align-center');
-            alignButton.setAttribute('title', 'Align (center)');
-          } else if (element.classList.contains('media-align-center')) {
-            element.classList.remove('media-align-center');
-            element.classList.add('media-align-right');
-            alignButton.setAttribute('title', 'Align (right)');
-          } else if (element.classList.contains('media-align-right')) {
-            element.classList.remove('media-align-right');
-            element.classList.add('media-align-left');
-            alignButton.setAttribute('title', 'Align (left)');
-          } else {
-            element.classList.add('media-align-center');
-            alignButton.setAttribute('title', 'Align (center)');
+          // Get current alignment
+          const currentAlignment = element.classList.contains('media-align-left') 
+            ? 'left' 
+            : element.classList.contains('media-align-right') 
+              ? 'right' 
+              : 'center';
+          
+          // Determine next alignment
+          let nextAlignment: 'left' | 'center' | 'right';
+          if (currentAlignment === 'left') nextAlignment = 'center';
+          else if (currentAlignment === 'center') nextAlignment = 'right';
+          else nextAlignment = 'left';
+          
+          // Apply new alignment
+          element.classList.remove('media-align-left', 'media-align-center', 'media-align-right');
+          element.classList.add(`media-align-${nextAlignment}`);
+          
+          // Update button title
+          alignButton.setAttribute('title', `Align (${nextAlignment})`);
+          
+          // Find the alignment icon and update it
+          const alignIcon = alignButton.querySelector('svg');
+          if (alignIcon) {
+            // We would update the alignment icon here
           }
         }
       });
@@ -333,7 +445,7 @@ function calculateQuadratic(a, b, c) {
       });
       
       // Enable direct resizing of the media content
-      const mediaContent = element.querySelector('.media-content');
+      const mediaContent = element.querySelector('.media-content') as HTMLElement;
       if (mediaContent) {
         mediaContent.addEventListener('mousedown', (e: MouseEvent) => {
           // Only start resize if we're on the edge
@@ -361,9 +473,10 @@ function calculateQuadratic(a, b, c) {
               element,
               startX: e.clientX,
               startY: e.clientY,
-              startWidth: (mediaContent as HTMLElement).offsetWidth,
-              startHeight: (mediaContent as HTMLElement).offsetHeight,
-              handle
+              startWidth: mediaContent.offsetWidth,
+              startHeight: mediaContent.offsetHeight,
+              handle: null,
+              isPanning: false
             });
             
             // Add a resize cursor class to the body
