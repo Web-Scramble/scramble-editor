@@ -1,5 +1,7 @@
 
 import React, { forwardRef, useEffect, useRef } from 'react';
+import { MediaToolbar, MediaEditPanel } from './MediaToolbar';
+import { useToast } from '../../hooks/use-toast';
 
 interface ContentAreaProps {
   // Any props can be added here if needed
@@ -8,6 +10,7 @@ interface ContentAreaProps {
 export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
   (props, ref) => {
     const contentRef = useRef<HTMLDivElement | null>(null);
+    const { toast } = useToast();
     
     useEffect(() => {
       if (contentRef.current) {
@@ -55,8 +58,9 @@ function calculateQuadratic(a, b, c) {
           <p>Use the toolbar above to format your text, add code blocks, equations, and more!</p>
         `;
         
-        // Setup event listeners for equations
+        // Setup event listeners for equations and media elements
         setupEquationHandlers();
+        setupMediaElementHandlers();
       }
     }, []);
     
@@ -84,6 +88,132 @@ function calculateQuadratic(a, b, c) {
         // Blur event to render the equation
         equation.addEventListener('blur', function() {
           equation.classList.add('equation-rendered');
+        });
+      });
+    };
+
+    // Setup event handlers for media elements
+    const setupMediaElementHandlers = () => {
+      if (!contentRef.current) return;
+      
+      const mediaElements = contentRef.current.querySelectorAll('.media-element');
+      
+      mediaElements.forEach(element => {
+        setupMediaElementEventListeners(element as HTMLElement);
+      });
+    };
+    
+    // Add event listeners to a media element
+    const setupMediaElementEventListeners = (element: HTMLElement) => {
+      const editButton = element.querySelector('.media-toolbar-btn[title^="Edit"]');
+      const alignButton = element.querySelector('.media-toolbar-btn[title^="Align"]');
+      const deleteButton = element.querySelector('.media-toolbar-btn[title="Delete"]');
+      const cancelButton = element.querySelector('.edit-btn[title="Cancel"]');
+      const applyButton = element.querySelector('.edit-btn[title="Apply"]');
+      
+      // Handle edit button
+      if (editButton) {
+        editButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const editPanel = element.querySelector('.media-edit-panel');
+          if (editPanel) {
+            editPanel.classList.add('active');
+          }
+        });
+      }
+      
+      // Handle cancel button in edit panel
+      if (cancelButton) {
+        cancelButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const editPanel = element.closest('.media-edit-panel');
+          if (editPanel) {
+            editPanel.classList.remove('active');
+          }
+        });
+      }
+      
+      // Handle apply button in edit panel
+      if (applyButton) {
+        applyButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const editPanel = element.closest('.media-edit-panel');
+          if (editPanel) {
+            editPanel.classList.remove('active');
+            toast({
+              title: "Changes applied",
+              description: "Media has been edited successfully",
+            });
+          }
+        });
+      }
+      
+      // Handle alignment button
+      if (alignButton) {
+        alignButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Cycle through alignment classes
+          if (element.classList.contains('media-align-left')) {
+            element.classList.remove('media-align-left');
+            element.classList.add('media-align-center');
+          } else if (element.classList.contains('media-align-center')) {
+            element.classList.remove('media-align-center');
+            element.classList.add('media-align-right');
+          } else if (element.classList.contains('media-align-right')) {
+            element.classList.remove('media-align-right');
+            element.classList.add('media-align-left');
+          } else {
+            element.classList.add('media-align-center');
+          }
+        });
+      }
+      
+      // Handle delete button
+      if (deleteButton) {
+        deleteButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          if (confirm('Are you sure you want to delete this media?')) {
+            element.remove();
+            toast({
+              title: "Media deleted",
+              description: "The media has been removed from the document",
+            });
+          }
+        });
+      }
+      
+      // Setup alignment controls in edit panel
+      const alignmentButtons = element.querySelectorAll('.alignment-btn');
+      alignmentButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Remove alignment classes
+          element.classList.remove('media-align-left', 'media-align-center', 'media-align-right');
+          
+          // Add the selected alignment class
+          if (btn.getAttribute('title')?.includes('Left')) {
+            element.classList.add('media-align-left');
+          } else if (btn.getAttribute('title')?.includes('Center')) {
+            element.classList.add('media-align-center');
+          } else if (btn.getAttribute('title')?.includes('Right')) {
+            element.classList.add('media-align-right');
+          }
+          
+          // Update active state
+          alignmentButtons.forEach(button => button.classList.remove('active'));
+          btn.classList.add('active');
         });
       });
     };
