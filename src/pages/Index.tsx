@@ -18,7 +18,7 @@ const Index = () => {
         </p>
         <p className="text-center mb-4 text-gray-600">
           Add images, videos, or documents and use the edit controls to resize, crop, and align them. 
-          Drag the crop overlay or its handles to adjust the selection.
+          <strong> Click Edit, then you can drag the crop overlay or use the corner handles to resize.</strong>
         </p>
         <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
           <TextEditor />
