@@ -1,5 +1,5 @@
 
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { MediaToolbar, MediaEditPanel } from './MediaToolbar';
 import { useToast } from '../../hooks/use-toast';
 
@@ -7,10 +7,29 @@ interface ContentAreaProps {
   // Any props can be added here if needed
 }
 
+interface ResizeState {
+  isResizing: boolean;
+  element: HTMLElement | null;
+  startX: number;
+  startY: number;
+  startWidth: number;
+  startHeight: number;
+  handle: string | null;
+}
+
 export const ContentArea = forwardRef<HTMLDivElement, ContentAreaProps>(
   (props, ref) => {
     const contentRef = useRef<HTMLDivElement | null>(null);
     const { toast } = useToast();
+    const [resizeState, setResizeState] = useState<ResizeState>({
+      isResizing: false,
+      element: null,
+      startX: 0,
+      startY: 0,
+      startWidth: 0,
+      startHeight: 0,
+      handle: null
+    });
     
     useEffect(() => {
       if (contentRef.current) {
@@ -61,8 +80,62 @@ function calculateQuadratic(a, b, c) {
         // Setup event listeners for equations and media elements
         setupEquationHandlers();
         setupMediaElementHandlers();
+        
+        // Setup global mouse move and up handlers for resize functionality
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        
+        return () => {
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+        };
       }
     }, []);
+    
+    // Mouse move handler for resizing media elements
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!resizeState.isResizing || !resizeState.element || !resizeState.handle) return;
+      
+      e.preventDefault();
+      
+      const mediaContent = resizeState.element.querySelector('.media-content');
+      if (!mediaContent) return;
+      
+      const dx = e.clientX - resizeState.startX;
+      const dy = e.clientY - resizeState.startY;
+      
+      let newWidth = resizeState.startWidth;
+      let newHeight = resizeState.startHeight;
+      
+      // Calculate new dimensions based on which handle is being dragged
+      if (resizeState.handle.includes('e')) {
+        newWidth = Math.max(100, resizeState.startWidth + dx);
+      }
+      if (resizeState.handle.includes('w')) {
+        newWidth = Math.max(100, resizeState.startWidth - dx);
+      }
+      
+      // Apply the new dimensions
+      mediaContent.style.width = `${newWidth}px`;
+      if (newHeight > 0) {
+        mediaContent.style.height = `${newHeight}px`;
+      }
+    };
+    
+    // Mouse up handler to stop resizing
+    const handleMouseUp = () => {
+      if (resizeState.isResizing) {
+        setResizeState({
+          isResizing: false,
+          element: null,
+          startX: 0,
+          startY: 0,
+          startWidth: 0,
+          startHeight: 0,
+          handle: null
+        });
+      }
+    };
     
     // Setup equation handlers for double-click editing
     const setupEquationHandlers = () => {
@@ -103,47 +176,82 @@ function calculateQuadratic(a, b, c) {
       });
     };
     
+    // Initialize resize handlers on the crop overlay
+    const initializeResizeHandlers = (cropOverlay: HTMLElement) => {
+      const resizeHandles = cropOverlay.querySelectorAll('.resize-handle');
+      
+      resizeHandles.forEach(handle => {
+        handle.addEventListener('mousedown', (e: MouseEvent) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const mediaElement = (e.target as HTMLElement).closest('.media-element') as HTMLElement;
+          if (!mediaElement) return;
+          
+          const mediaContent = mediaElement.querySelector('.media-content') as HTMLElement;
+          if (!mediaContent) return;
+          
+          // Get handle position (nw, ne, sw, se)
+          const handleClass = Array.from((e.target as HTMLElement).classList).find(cls => cls.startsWith('resize-handle-'));
+          const handle = handleClass ? handleClass.replace('resize-handle-', '') : null;
+          
+          setResizeState({
+            isResizing: true,
+            element: mediaElement,
+            startX: e.clientX,
+            startY: e.clientY,
+            startWidth: mediaContent.offsetWidth,
+            startHeight: mediaContent.offsetHeight,
+            handle
+          });
+        });
+      });
+    };
+    
     // Add event listeners to a media element
     const setupMediaElementEventListeners = (element: HTMLElement) => {
-      const editButton = element.querySelector('.media-toolbar-btn[title^="Edit"]');
-      const alignButton = element.querySelector('.media-toolbar-btn[title^="Align"]');
-      const deleteButton = element.querySelector('.media-toolbar-btn[title="Delete"]');
-      const cancelButton = element.querySelector('.edit-btn[title="Cancel"]');
-      const applyButton = element.querySelector('.edit-btn[title="Apply"]');
-      
-      // Handle edit button
-      if (editButton) {
-        editButton.addEventListener('click', (e) => {
+      // Handle edit button click
+      element.addEventListener('click', (e) => {
+        const editButton = (e.target as HTMLElement).closest('.media-toolbar-btn[title^="Edit"]');
+        if (editButton) {
           e.preventDefault();
           e.stopPropagation();
           
           const editPanel = element.querySelector('.media-edit-panel');
           if (editPanel) {
             editPanel.classList.add('active');
+            
+            // Initialize resize handlers on the crop overlay
+            const cropOverlay = editPanel.querySelector('.crop-overlay');
+            if (cropOverlay) {
+              initializeResizeHandlers(cropOverlay as HTMLElement);
+            }
           }
-        });
-      }
+        }
+      });
       
       // Handle cancel button in edit panel
-      if (cancelButton) {
-        cancelButton.addEventListener('click', (e) => {
+      element.addEventListener('click', (e) => {
+        const cancelButton = (e.target as HTMLElement).closest('.edit-btn[title="Cancel"]');
+        if (cancelButton) {
           e.preventDefault();
           e.stopPropagation();
           
-          const editPanel = element.closest('.media-edit-panel');
+          const editPanel = element.querySelector('.media-edit-panel');
           if (editPanel) {
             editPanel.classList.remove('active');
           }
-        });
-      }
+        }
+      });
       
       // Handle apply button in edit panel
-      if (applyButton) {
-        applyButton.addEventListener('click', (e) => {
+      element.addEventListener('click', (e) => {
+        const applyButton = (e.target as HTMLElement).closest('.edit-btn-primary');
+        if (applyButton) {
           e.preventDefault();
           e.stopPropagation();
           
-          const editPanel = element.closest('.media-edit-panel');
+          const editPanel = element.querySelector('.media-edit-panel');
           if (editPanel) {
             editPanel.classList.remove('active');
             toast({
@@ -151,12 +259,13 @@ function calculateQuadratic(a, b, c) {
               description: "Media has been edited successfully",
             });
           }
-        });
-      }
+        }
+      });
       
-      // Handle alignment button
-      if (alignButton) {
-        alignButton.addEventListener('click', (e) => {
+      // Handle alignment button click
+      element.addEventListener('click', (e) => {
+        const alignButton = (e.target as HTMLElement).closest('.media-toolbar-btn[title^="Align"]');
+        if (alignButton) {
           e.preventDefault();
           e.stopPropagation();
           
@@ -164,21 +273,26 @@ function calculateQuadratic(a, b, c) {
           if (element.classList.contains('media-align-left')) {
             element.classList.remove('media-align-left');
             element.classList.add('media-align-center');
+            alignButton.setAttribute('title', 'Align (center)');
           } else if (element.classList.contains('media-align-center')) {
             element.classList.remove('media-align-center');
             element.classList.add('media-align-right');
+            alignButton.setAttribute('title', 'Align (right)');
           } else if (element.classList.contains('media-align-right')) {
             element.classList.remove('media-align-right');
             element.classList.add('media-align-left');
+            alignButton.setAttribute('title', 'Align (left)');
           } else {
             element.classList.add('media-align-center');
+            alignButton.setAttribute('title', 'Align (center)');
           }
-        });
-      }
+        }
+      });
       
-      // Handle delete button
-      if (deleteButton) {
-        deleteButton.addEventListener('click', (e) => {
+      // Handle delete button click
+      element.addEventListener('click', (e) => {
+        const deleteButton = (e.target as HTMLElement).closest('.media-toolbar-btn[title="Delete"]');
+        if (deleteButton) {
           e.preventDefault();
           e.stopPropagation();
           
@@ -189,33 +303,74 @@ function calculateQuadratic(a, b, c) {
               description: "The media has been removed from the document",
             });
           }
-        });
-      }
+        }
+      });
       
       // Setup alignment controls in edit panel
-      const alignmentButtons = element.querySelectorAll('.alignment-btn');
-      alignmentButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
+      element.addEventListener('click', (e) => {
+        const alignmentButton = (e.target as HTMLElement).closest('.alignment-btn');
+        if (alignmentButton) {
           e.preventDefault();
           e.stopPropagation();
+          
+          const alignmentButtons = element.querySelectorAll('.alignment-btn');
+          alignmentButtons.forEach(btn => btn.classList.remove('bg-blue-100'));
+          alignmentButton.classList.add('bg-blue-100');
           
           // Remove alignment classes
           element.classList.remove('media-align-left', 'media-align-center', 'media-align-right');
           
           // Add the selected alignment class
-          if (btn.getAttribute('title')?.includes('Left')) {
+          const title = alignmentButton.getAttribute('title');
+          if (title?.includes('Left')) {
             element.classList.add('media-align-left');
-          } else if (btn.getAttribute('title')?.includes('Center')) {
+          } else if (title?.includes('Center')) {
             element.classList.add('media-align-center');
-          } else if (btn.getAttribute('title')?.includes('Right')) {
+          } else if (title?.includes('Right')) {
             element.classList.add('media-align-right');
           }
-          
-          // Update active state
-          alignmentButtons.forEach(button => button.classList.remove('active'));
-          btn.classList.add('active');
-        });
+        }
       });
+      
+      // Enable direct resizing of the media content
+      const mediaContent = element.querySelector('.media-content');
+      if (mediaContent) {
+        mediaContent.addEventListener('mousedown', (e: MouseEvent) => {
+          // Only start resize if we're on the edge
+          const rect = mediaContent.getBoundingClientRect();
+          const edgeSize = 10;
+          
+          if (
+            e.clientX > rect.right - edgeSize || 
+            e.clientX < rect.left + edgeSize || 
+            e.clientY > rect.bottom - edgeSize || 
+            e.clientY < rect.top + edgeSize
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            let handle = '';
+            if (e.clientY < rect.top + edgeSize) handle += 'n';
+            if (e.clientY > rect.bottom - edgeSize) handle += 's';
+            if (e.clientX < rect.left + edgeSize) handle += 'w';
+            if (e.clientX > rect.right - edgeSize) handle += 'e';
+            
+            // Set the resize state
+            setResizeState({
+              isResizing: true,
+              element,
+              startX: e.clientX,
+              startY: e.clientY,
+              startWidth: (mediaContent as HTMLElement).offsetWidth,
+              startHeight: (mediaContent as HTMLElement).offsetHeight,
+              handle
+            });
+            
+            // Add a resize cursor class to the body
+            document.body.style.cursor = handle ? `${handle}-resize` : 'move';
+          }
+        });
+      }
     };
 
     // Apply focus styles

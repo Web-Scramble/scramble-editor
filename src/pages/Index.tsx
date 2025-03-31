@@ -16,7 +16,9 @@ const Index = () => {
             : "The toolbar can be moved around by dragging the handle and minimized with the icon in the top-right corner."
           }
         </p>
-        <TextEditor />
+        <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
+          <TextEditor />
+        </div>
       </main>
       <Toaster />
     </div>

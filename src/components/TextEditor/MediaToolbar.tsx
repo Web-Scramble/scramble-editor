@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Edit, AlignCenter, Trash2, Download, Crop, ChevronsExpand, Check, X, AlignLeft, AlignRight } from 'lucide-react';
+import { Edit, AlignCenter, Trash2, Download, Crop, Maximize2, Check, X, AlignLeft, AlignRight } from 'lucide-react';
 
 interface MediaToolbarProps {
   type: 'image' | 'video' | 'document';
@@ -43,25 +43,25 @@ export const MediaToolbar: React.FC<MediaToolbarProps> = ({
   };
 
   return (
-    <div className="media-toolbar">
+    <div className="media-toolbar absolute top-2 right-2 bg-white/80 rounded-md shadow-sm backdrop-blur-sm flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
       {type !== 'document' && (
-        <button className="media-toolbar-btn" title="Edit" onClick={handleEdit}>
+        <button className="media-toolbar-btn p-1 hover:bg-gray-100 rounded-md" title="Edit" onClick={handleEdit}>
           <Edit size={16} />
         </button>
       )}
       {type !== 'document' && (
-        <button className="media-toolbar-btn" title={`Align (${currentAlignment})`} onClick={handleAlign}>
+        <button className="media-toolbar-btn p-1 hover:bg-gray-100 rounded-md" title={`Align (${currentAlignment})`} onClick={handleAlign}>
           {currentAlignment === 'left' && <AlignLeft size={16} />}
           {currentAlignment === 'center' && <AlignCenter size={16} />}
           {currentAlignment === 'right' && <AlignRight size={16} />}
         </button>
       )}
       {type === 'document' && (
-        <button className="media-toolbar-btn" title="Download">
+        <button className="media-toolbar-btn p-1 hover:bg-gray-100 rounded-md" title="Download">
           <Download size={16} />
         </button>
       )}
-      <button className="media-toolbar-btn" title="Delete" onClick={handleDelete}>
+      <button className="media-toolbar-btn p-1 hover:bg-gray-100 rounded-md text-red-500 hover:text-red-700" title="Delete" onClick={handleDelete}>
         <Trash2 size={16} />
       </button>
     </div>
@@ -75,56 +75,59 @@ export const MediaEditPanel: React.FC<{
   currentAlignment: 'left' | 'center' | 'right';
 }> = ({ onApply, onCancel, onAlignChange, currentAlignment }) => {
   return (
-    <div className="media-edit-panel">
-      <h3>Edit Media</h3>
-      <div className="cropper-container">
-        <div className="crop-overlay" style={{ width: '80%', height: '80%', top: '10%', left: '10%' }}>
-          <div className="resize-handle resize-handle-nw"></div>
-          <div className="resize-handle resize-handle-ne"></div>
-          <div className="resize-handle resize-handle-sw"></div>
-          <div className="resize-handle resize-handle-se"></div>
+    <div className="media-edit-panel absolute inset-0 bg-black/50 z-20 flex flex-col items-center justify-center">
+      <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-md">
+        <h3 className="text-lg font-medium mb-4">Edit Media</h3>
+        <div className="cropper-container relative bg-gray-100 mb-4 aspect-video">
+          <div className="crop-overlay absolute border-2 border-blue-500 cursor-move"
+               style={{ width: '80%', height: '80%', top: '10%', left: '10%' }}>
+            <div className="resize-handle resize-handle-nw absolute w-3 h-3 bg-white border-2 border-blue-500 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2 cursor-nwse-resize"></div>
+            <div className="resize-handle resize-handle-ne absolute w-3 h-3 bg-white border-2 border-blue-500 rounded-full top-0 right-0 translate-x-1/2 -translate-y-1/2 cursor-nesw-resize"></div>
+            <div className="resize-handle resize-handle-sw absolute w-3 h-3 bg-white border-2 border-blue-500 rounded-full bottom-0 left-0 -translate-x-1/2 translate-y-1/2 cursor-nesw-resize"></div>
+            <div className="resize-handle resize-handle-se absolute w-3 h-3 bg-white border-2 border-blue-500 rounded-full bottom-0 right-0 translate-x-1/2 translate-y-1/2 cursor-nwse-resize"></div>
+          </div>
         </div>
-      </div>
-      <div className="edit-controls">
-        <button className="edit-btn" title="Crop">
-          <Crop size={16} />
-          Crop
-        </button>
-        <button className="edit-btn" title="Resize">
-          <ChevronsExpand size={16} />
-          Resize
-        </button>
-        <button className="edit-btn edit-btn-primary" title="Apply" onClick={onApply}>
-          <Check size={16} />
-          Apply
-        </button>
-        <button className="edit-btn" title="Cancel" onClick={onCancel}>
-          <X size={16} />
-          Cancel
-        </button>
-      </div>
-      <div className="alignment-controls">
-        <button 
-          className={`alignment-btn ${currentAlignment === 'left' ? 'active' : ''}`} 
-          title="Align Left"
-          onClick={() => onAlignChange('left')}
-        >
-          <AlignLeft size={16} />
-        </button>
-        <button 
-          className={`alignment-btn ${currentAlignment === 'center' ? 'active' : ''}`} 
-          title="Align Center"
-          onClick={() => onAlignChange('center')}
-        >
-          <AlignCenter size={16} />
-        </button>
-        <button 
-          className={`alignment-btn ${currentAlignment === 'right' ? 'active' : ''}`} 
-          title="Align Right"
-          onClick={() => onAlignChange('right')}
-        >
-          <AlignRight size={16} />
-        </button>
+        <div className="edit-controls flex flex-wrap gap-2 mb-4">
+          <button className="edit-btn flex items-center gap-1 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded" title="Crop">
+            <Crop size={16} />
+            Crop
+          </button>
+          <button className="edit-btn flex items-center gap-1 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded" title="Resize">
+            <Maximize2 size={16} />
+            Resize
+          </button>
+          <button className="edit-btn-primary flex items-center gap-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded ml-auto" title="Apply" onClick={onApply}>
+            <Check size={16} />
+            Apply
+          </button>
+          <button className="edit-btn flex items-center gap-1 px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded" title="Cancel" onClick={onCancel}>
+            <X size={16} />
+            Cancel
+          </button>
+        </div>
+        <div className="alignment-controls flex justify-center gap-2">
+          <button 
+            className={`alignment-btn p-2 rounded ${currentAlignment === 'left' ? 'bg-blue-100' : 'bg-gray-100 hover:bg-gray-200'}`} 
+            title="Align Left"
+            onClick={() => onAlignChange('left')}
+          >
+            <AlignLeft size={16} />
+          </button>
+          <button 
+            className={`alignment-btn p-2 rounded ${currentAlignment === 'center' ? 'bg-blue-100' : 'bg-gray-100 hover:bg-gray-200'}`} 
+            title="Align Center"
+            onClick={() => onAlignChange('center')}
+          >
+            <AlignCenter size={16} />
+          </button>
+          <button 
+            className={`alignment-btn p-2 rounded ${currentAlignment === 'right' ? 'bg-blue-100' : 'bg-gray-100 hover:bg-gray-200'}`} 
+            title="Align Right"
+            onClick={() => onAlignChange('right')}
+          >
+            <AlignRight size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
