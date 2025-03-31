@@ -265,10 +265,111 @@ export const TextEditor = () => {
             img.alt = file.name;
             img.className = 'editor-image';
             
+            // Add media controls
+            const controls = document.createElement('div');
+            controls.className = 'media-controls';
+            
+            // Size controls
+            const smallBtn = document.createElement('button');
+            smallBtn.className = 'media-control-btn';
+            smallBtn.textContent = 'S';
+            smallBtn.dataset.action = 'resize-small';
+            
+            const mediumBtn = document.createElement('button');
+            mediumBtn.className = 'media-control-btn';
+            mediumBtn.textContent = 'M';
+            mediumBtn.dataset.action = 'resize-medium';
+            
+            const largeBtn = document.createElement('button');
+            largeBtn.className = 'media-control-btn';
+            largeBtn.textContent = 'L';
+            largeBtn.dataset.action = 'resize-large';
+            
+            // Alignment controls
+            const leftBtn = document.createElement('button');
+            leftBtn.className = 'media-control-btn';
+            leftBtn.textContent = '◀';
+            leftBtn.dataset.action = 'align-left';
+            
+            const centerBtn = document.createElement('button');
+            centerBtn.className = 'media-control-btn';
+            centerBtn.textContent = '■';
+            centerBtn.dataset.action = 'align-center';
+            
+            const rightBtn = document.createElement('button');
+            rightBtn.className = 'media-control-btn';
+            rightBtn.textContent = '▶';
+            rightBtn.dataset.action = 'align-right';
+            
+            // Add all buttons to controls
+            controls.appendChild(smallBtn);
+            controls.appendChild(mediumBtn);
+            controls.appendChild(largeBtn);
+            controls.appendChild(leftBtn);
+            controls.appendChild(centerBtn);
+            controls.appendChild(rightBtn);
+            
             imgContainer.appendChild(img);
+            imgContainer.appendChild(controls);
             
             range.deleteContents();
             range.insertNode(imgContainer);
+            
+            // Setup event handlers for the new controls
+            const setupNewMediaControls = () => {
+              imgContainer.addEventListener('click', function(e) {
+                if ((e.target as Element).closest('.media-controls')) return;
+                
+                const wasActive = imgContainer.classList.contains('media-active');
+                
+                // Remove active class from all media containers
+                document.querySelectorAll('.media-container').forEach(mc => {
+                  mc.classList.remove('media-active');
+                });
+                
+                // If this container wasn't active before, make it active
+                if (!wasActive) {
+                  imgContainer.classList.add('media-active');
+                }
+              });
+              
+              const buttons = controls.querySelectorAll('.media-control-btn');
+              buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  
+                  const action = (btn as HTMLElement).dataset.action;
+                  
+                  switch(action) {
+                    case 'resize-small':
+                      imgContainer.style.width = '25%';
+                      break;
+                    case 'resize-medium':
+                      imgContainer.style.width = '50%';
+                      break;
+                    case 'resize-large':
+                      imgContainer.style.width = '100%';
+                      break;
+                    case 'align-left':
+                      imgContainer.style.marginLeft = '0';
+                      imgContainer.style.marginRight = 'auto';
+                      break;
+                    case 'align-center':
+                      imgContainer.style.marginLeft = 'auto';
+                      imgContainer.style.marginRight = 'auto';
+                      break;
+                    case 'align-right':
+                      imgContainer.style.marginLeft = 'auto';
+                      imgContainer.style.marginRight = '0';
+                      break;
+                  }
+                });
+              });
+            };
+            
+            // Call the setup function
+            setupNewMediaControls();
             
             // Move cursor after the image
             range.setStartAfter(imgContainer);
@@ -313,10 +414,111 @@ export const TextEditor = () => {
             video.controls = true;
             video.className = 'editor-video';
             
+            // Add media controls
+            const controls = document.createElement('div');
+            controls.className = 'media-controls';
+            
+            // Size controls
+            const smallBtn = document.createElement('button');
+            smallBtn.className = 'media-control-btn';
+            smallBtn.textContent = 'S';
+            smallBtn.dataset.action = 'resize-small';
+            
+            const mediumBtn = document.createElement('button');
+            mediumBtn.className = 'media-control-btn';
+            mediumBtn.textContent = 'M';
+            mediumBtn.dataset.action = 'resize-medium';
+            
+            const largeBtn = document.createElement('button');
+            largeBtn.className = 'media-control-btn';
+            largeBtn.textContent = 'L';
+            largeBtn.dataset.action = 'resize-large';
+            
+            // Alignment controls
+            const leftBtn = document.createElement('button');
+            leftBtn.className = 'media-control-btn';
+            leftBtn.textContent = '◀';
+            leftBtn.dataset.action = 'align-left';
+            
+            const centerBtn = document.createElement('button');
+            centerBtn.className = 'media-control-btn';
+            centerBtn.textContent = '■';
+            centerBtn.dataset.action = 'align-center';
+            
+            const rightBtn = document.createElement('button');
+            rightBtn.className = 'media-control-btn';
+            rightBtn.textContent = '▶';
+            rightBtn.dataset.action = 'align-right';
+            
+            // Add all buttons to controls
+            controls.appendChild(smallBtn);
+            controls.appendChild(mediumBtn);
+            controls.appendChild(largeBtn);
+            controls.appendChild(leftBtn);
+            controls.appendChild(centerBtn);
+            controls.appendChild(rightBtn);
+            
             videoContainer.appendChild(video);
+            videoContainer.appendChild(controls);
             
             range.deleteContents();
             range.insertNode(videoContainer);
+            
+            // Setup event handlers for the new controls
+            const setupNewMediaControls = () => {
+              videoContainer.addEventListener('click', function(e) {
+                if ((e.target as Element).closest('.media-controls')) return;
+                
+                const wasActive = videoContainer.classList.contains('media-active');
+                
+                // Remove active class from all media containers
+                document.querySelectorAll('.media-container').forEach(mc => {
+                  mc.classList.remove('media-active');
+                });
+                
+                // If this container wasn't active before, make it active
+                if (!wasActive) {
+                  videoContainer.classList.add('media-active');
+                }
+              });
+              
+              const buttons = controls.querySelectorAll('.media-control-btn');
+              buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  
+                  const action = (btn as HTMLElement).dataset.action;
+                  
+                  switch(action) {
+                    case 'resize-small':
+                      videoContainer.style.width = '25%';
+                      break;
+                    case 'resize-medium':
+                      videoContainer.style.width = '50%';
+                      break;
+                    case 'resize-large':
+                      videoContainer.style.width = '100%';
+                      break;
+                    case 'align-left':
+                      videoContainer.style.marginLeft = '0';
+                      videoContainer.style.marginRight = 'auto';
+                      break;
+                    case 'align-center':
+                      videoContainer.style.marginLeft = 'auto';
+                      videoContainer.style.marginRight = 'auto';
+                      break;
+                    case 'align-right':
+                      videoContainer.style.marginLeft = 'auto';
+                      videoContainer.style.marginRight = '0';
+                      break;
+                  }
+                });
+              });
+            };
+            
+            // Call the setup function
+            setupNewMediaControls();
             
             // Move cursor after the video
             range.setStartAfter(videoContainer);

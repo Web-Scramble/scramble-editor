@@ -53,6 +53,14 @@ function calculateQuadratic(a, b, c) {
           <p>You can insert images:</p>
           <div class="media-container image-container">
             <img src="public/lovable-uploads/3eb5291f-2406-42ce-9ff8-5fcfa4e12fcb.png" alt="Color Gradient Example" class="editor-image" />
+            <div class="media-controls">
+              <button class="media-control-btn" data-action="resize-small">S</button>
+              <button class="media-control-btn" data-action="resize-medium">M</button>
+              <button class="media-control-btn" data-action="resize-large">L</button>
+              <button class="media-control-btn" data-action="align-left">◀</button>
+              <button class="media-control-btn" data-action="align-center">■</button>
+              <button class="media-control-btn" data-action="align-right">▶</button>
+            </div>
           </div>
           
           <p>Attach documents or files:</p>
@@ -75,6 +83,7 @@ function calculateQuadratic(a, b, c) {
         
         // Setup event listeners for equations and other interactive elements
         setupEquationHandlers();
+        setupMediaHandlers();
       }
     }, []);
     
@@ -112,6 +121,81 @@ function calculateQuadratic(a, b, c) {
           e.preventDefault();
           alert('Preview functionality is available when you upload your own files.');
         });
+      });
+    };
+
+    // Setup media handlers for controlling images and videos
+    const setupMediaHandlers = () => {
+      if (!contentRef.current) return;
+
+      // Add click listeners to all media containers
+      const mediaContainers = contentRef.current.querySelectorAll('.media-container');
+      mediaContainers.forEach(container => {
+        // Show controls on click
+        container.addEventListener('click', function(e) {
+          // Prevent handling clicks on control buttons twice
+          if ((e.target as Element).closest('.media-controls')) return;
+          
+          // Toggle active state
+          const wasActive = container.classList.contains('media-active');
+          
+          // Remove active class from all media containers first
+          document.querySelectorAll('.media-container').forEach(mc => {
+            mc.classList.remove('media-active');
+          });
+          
+          // If this container wasn't active before, make it active
+          if (!wasActive) {
+            container.classList.add('media-active');
+          }
+        });
+
+        // Setup control buttons
+        const controlButtons = container.querySelectorAll('.media-control-btn');
+        controlButtons.forEach(button => {
+          button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const action = (button as HTMLElement).dataset.action;
+            const mediaElement = container.querySelector('img, video') as HTMLElement;
+            
+            if (!mediaElement) return;
+            
+            switch(action) {
+              case 'resize-small':
+                container.style.width = '25%';
+                break;
+              case 'resize-medium':
+                container.style.width = '50%';
+                break;
+              case 'resize-large':
+                container.style.width = '100%';
+                break;
+              case 'align-left':
+                container.style.marginLeft = '0';
+                container.style.marginRight = 'auto';
+                break;
+              case 'align-center':
+                container.style.marginLeft = 'auto';
+                container.style.marginRight = 'auto';
+                break;
+              case 'align-right':
+                container.style.marginLeft = 'auto';
+                container.style.marginRight = '0';
+                break;
+            }
+          });
+        });
+      });
+
+      // Close active media on outside click
+      document.addEventListener('click', function(e) {
+        if (!(e.target as Element).closest('.media-container')) {
+          document.querySelectorAll('.media-container').forEach(container => {
+            container.classList.remove('media-active');
+          });
+        }
       });
     };
 

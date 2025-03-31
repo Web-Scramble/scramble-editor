@@ -548,10 +548,13 @@
   max-width: 100%;
   border-radius: 4px;
   overflow: hidden;
+  transition: all 0.2s ease;
+  width: 100%;
 }
 
 .image-container {
   text-align: center;
+  display: inline-block;
 }
 
 .editor-image {
@@ -559,12 +562,14 @@
   height: auto;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: block;
 }
 
 .video-container {
   background-color: #000;
   border-radius: 4px;
   overflow: hidden;
+  display: inline-block;
 }
 
 .editor-video {
@@ -572,6 +577,74 @@
   max-height: 400px;
   display: block;
 }
+
+/* Media controls */
+.media-controls {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  gap: 4px;
+}
+
+.media-container:hover .media-controls,
+.media-container.media-active .media-controls {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.media-control-btn {
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.media-control-btn:hover {
+  background-color: #f0f0f0;
+  border-color: #bbb;
+}
+
+.media-active {
+  outline: 2px solid #0066cc;
+  z-index: 5;
+}
+
+/* Selected media item */
+.media-container.selected {
+  outline: 2px solid #0066cc;
+}
+
+/* Resize handles */
+.resize-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border: 1px solid #0066cc;
+  z-index: 15;
+}
+
+.resize-handle-nw { top: -4px; left: -4px; cursor: nw-resize; }
+.resize-handle-ne { top: -4px; right: -4px; cursor: ne-resize; }
+.resize-handle-sw { bottom: -4px; left: -4px; cursor: sw-resize; }
+.resize-handle-se { bottom: -4px; right: -4px; cursor: se-resize; }
 
 /* Attachment styles */
 .attachment {
@@ -804,6 +877,57 @@
     margin-top: 16px;
     min-height: calc(100vh - 160px);
   }
+  
+  /* Improve media controls on mobile */
+  .media-controls {
+    opacity: 1;
+    pointer-events: all;
+    position: static;
+    transform: none;
+    justify-content: center;
+    margin-top: 8px;
+    width: 100%;
+  }
+  
+  .media-control-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .media-container:hover .media-controls,
+  .media-container.media-active .media-controls {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .media-control-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #bbb;
+  }
+  
+  .media-active {
+    outline: 2px solid #0066cc;
+    z-index: 5;
+  }
+  
+  .media-container.selected {
+    outline: 2px solid #0066cc;
+  }
+  
+  .resize-handle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border: 1px solid #0066cc;
+    z-index: 15;
+  }
+  
+  .resize-handle-nw { top: -4px; left: -4px; cursor: nw-resize; }
+  .resize-handle-ne { top: -4px; right: -4px; cursor: ne-resize; }
+  .resize-handle-sw { bottom: -4px; left: -4px; cursor: sw-resize; }
+  .resize-handle-se { bottom: -4px; right: -4px; cursor: se-resize; }
 }
 
 @media (max-width: 480px) {
