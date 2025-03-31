@@ -57,40 +57,9 @@ function calculateQuadratic(a, b, c) {
           
           <p>Double-click the equation to edit it in LaTeX format.</p>
 
-          <p>You can insert images:</p>
-          <div class="media-container image-container">
-            <img src="public/lovable-uploads/3eb5291f-2406-42ce-9ff8-5fcfa4e12fcb.png" alt="Color Gradient Example" class="editor-image" />
-            <div class="media-controls">
-              <button class="media-control-btn" data-action="resize-small">S</button>
-              <button class="media-control-btn" data-action="resize-medium">M</button>
-              <button class="media-control-btn" data-action="resize-large">L</button>
-              <button class="media-control-btn" data-action="align-left">◀</button>
-              <button class="media-control-btn" data-action="align-center">■</button>
-              <button class="media-control-btn" data-action="align-right">▶</button>
-              <button class="media-control-btn media-delete-btn" data-action="delete">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-              </button>
-              <button class="media-control-btn media-edit-btn" data-action="edit">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>
-              </button>
-              <button class="media-control-btn media-crop-btn" data-action="crop">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>
-              </button>
-            </div>
-          </div>
+          <p>Click the media toolbar buttons to insert images and videos that will automatically fit the editor width.</p>
           
-          <p>Attach documents or files:</p>
-          <div class="attachment">
-            <span class="attachment-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                <polyline points="13 2 13 9 20 9"></polyline>
-              </svg>
-            </span>
-            <span class="attachment-name">example-document.pdf</span>
-            <span class="attachment-size">245.35 KB</span>
-            <button class="attachment-preview-btn">Preview</button>
-          </div>
+          <p>After inserting media, click on it to see the controls for resizing, alignment, and other options.</p>
           
           <hr class="editor-divider">
           
@@ -135,7 +104,8 @@ function calculateQuadratic(a, b, c) {
       previewButtons.forEach(button => {
         button.addEventListener('click', function(e) {
           e.preventDefault();
-          alert('Preview functionality is available when you upload your own files.');
+          // The preview functionality is now implemented in TextEditor.tsx
+          // This is just a fallback for any existing buttons
         });
       });
     };
@@ -150,7 +120,7 @@ function calculateQuadratic(a, b, c) {
         // Show controls on click
         container.addEventListener('click', function(e) {
           // Prevent handling clicks on control buttons twice
-          if ((e.target as Element).closest('.media-controls')) return;
+          if ((e.target as Element)?.closest('.media-controls')) return;
           
           // Toggle active state
           const wasActive = container.classList.contains('media-active');
@@ -165,6 +135,19 @@ function calculateQuadratic(a, b, c) {
             container.classList.add('media-active');
           }
         });
+
+        // Set default styles to ensure media fits properly
+        const mediaElement = container.querySelector('img, video') as HTMLElement;
+        if (mediaElement) {
+          mediaElement.style.maxWidth = '100%';
+          mediaElement.style.height = 'auto';
+          mediaElement.style.display = 'block';
+          
+          // Set default container styles
+          (container as HTMLElement).style.width = '100%';
+          (container as HTMLElement).style.marginLeft = 'auto';
+          (container as HTMLElement).style.marginRight = 'auto';
+        }
 
         // Setup control buttons
         const controlButtons = container.querySelectorAll('.media-control-btn');

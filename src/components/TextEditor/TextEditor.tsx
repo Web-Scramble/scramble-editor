@@ -4,6 +4,7 @@ import { ContentArea } from './ContentArea';
 import './TextEditor.css';
 import { GripVertical, Minimize, Plus, Image, Video, File } from 'lucide-react';
 import { useIsMobile } from '../../hooks/use-mobile';
+import { toast } from "sonner";
 
 export const TextEditor = () => {
   const [editorState, setEditorState] = useState({
@@ -251,6 +252,8 @@ export const TextEditor = () => {
         const file = this.files[0];
         const reader = new FileReader();
         
+        toast.info(`Uploading image: ${file.name}...`);
+        
         reader.onload = function(e) {
           const imageUrl = e.target?.result as string;
           const selection = window.getSelection();
@@ -259,65 +262,75 @@ export const TextEditor = () => {
             
             const imgContainer = document.createElement('div');
             imgContainer.className = 'media-container image-container animate-in';
+            imgContainer.style.width = '100%';
+            imgContainer.style.marginLeft = 'auto';
+            imgContainer.style.marginRight = 'auto';
             
             const img = document.createElement('img');
             img.src = imageUrl;
             img.alt = file.name;
             img.className = 'editor-image';
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            img.style.display = 'block';
             
-            // Add media controls
             const controls = document.createElement('div');
             controls.className = 'media-controls';
             
-            // Size controls
             const smallBtn = document.createElement('button');
             smallBtn.className = 'media-control-btn';
             smallBtn.textContent = 'S';
             smallBtn.dataset.action = 'resize-small';
+            smallBtn.title = 'Small size (25%)';
             
             const mediumBtn = document.createElement('button');
             mediumBtn.className = 'media-control-btn';
             mediumBtn.textContent = 'M';
             mediumBtn.dataset.action = 'resize-medium';
+            mediumBtn.title = 'Medium size (50%)';
             
             const largeBtn = document.createElement('button');
             largeBtn.className = 'media-control-btn';
             largeBtn.textContent = 'L';
             largeBtn.dataset.action = 'resize-large';
+            largeBtn.title = 'Large size (100%)';
             
-            // Alignment controls
             const leftBtn = document.createElement('button');
             leftBtn.className = 'media-control-btn';
             leftBtn.textContent = '◀';
             leftBtn.dataset.action = 'align-left';
+            leftBtn.title = 'Align left';
             
             const centerBtn = document.createElement('button');
             centerBtn.className = 'media-control-btn';
             centerBtn.textContent = '■';
             centerBtn.dataset.action = 'align-center';
+            centerBtn.title = 'Align center';
             
             const rightBtn = document.createElement('button');
             rightBtn.className = 'media-control-btn';
             rightBtn.textContent = '▶';
             rightBtn.dataset.action = 'align-right';
+            rightBtn.title = 'Align right';
             
-            // Delete, Edit, and Crop buttons
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'media-control-btn media-delete-btn';
             deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
             deleteBtn.dataset.action = 'delete';
+            deleteBtn.title = 'Delete';
             
             const editBtn = document.createElement('button');
             editBtn.className = 'media-control-btn media-edit-btn';
             editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>';
             editBtn.dataset.action = 'edit';
+            editBtn.title = 'Edit';
             
             const cropBtn = document.createElement('button');
             cropBtn.className = 'media-control-btn media-crop-btn';
             cropBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>';
             cropBtn.dataset.action = 'crop';
+            cropBtn.title = 'Crop';
             
-            // Add all buttons to controls
             controls.appendChild(smallBtn);
             controls.appendChild(mediumBtn);
             controls.appendChild(largeBtn);
@@ -334,19 +347,21 @@ export const TextEditor = () => {
             range.deleteContents();
             range.insertNode(imgContainer);
             
-            // Setup event handlers for the new controls
+            imgContainer.classList.add('media-active');
+            setTimeout(() => {
+              imgContainer.classList.remove('media-active');
+            }, 2000);
+            
             const setupNewMediaControls = () => {
               imgContainer.addEventListener('click', function(e) {
                 if ((e.target as Element).closest('.media-controls')) return;
                 
                 const wasActive = imgContainer.classList.contains('media-active');
                 
-                // Remove active class from all media containers
                 document.querySelectorAll('.media-container').forEach(mc => {
                   mc.classList.remove('media-active');
                 });
                 
-                // If this container wasn't active before, make it active
                 if (!wasActive) {
                   imgContainer.classList.add('media-active');
                 }
@@ -398,10 +413,10 @@ export const TextEditor = () => {
               });
             };
             
-            // Call the setup function
             setupNewMediaControls();
             
-            // Move cursor after the image
+            toast.success(`Image added successfully!`);
+            
             range.setStartAfter(imgContainer);
             range.collapse(true);
             selection.removeAllRanges();
@@ -430,6 +445,8 @@ export const TextEditor = () => {
         const file = this.files[0];
         const reader = new FileReader();
         
+        toast.info(`Uploading video: ${file.name}...`);
+        
         reader.onload = function(e) {
           const videoUrl = e.target?.result as string;
           const selection = window.getSelection();
@@ -438,66 +455,76 @@ export const TextEditor = () => {
             
             const videoContainer = document.createElement('div');
             videoContainer.className = 'media-container video-container animate-in';
+            videoContainer.style.width = '100%';
+            videoContainer.style.marginLeft = 'auto';
+            videoContainer.style.marginRight = 'auto';
             
             const video = document.createElement('video');
             video.src = videoUrl;
             video.controls = true;
             video.autoplay = false;
             video.className = 'editor-video';
+            video.style.maxWidth = '100%';
+            video.style.height = 'auto';
+            video.style.display = 'block';
             
-            // Add media controls
             const controls = document.createElement('div');
             controls.className = 'media-controls';
             
-            // Size controls
             const smallBtn = document.createElement('button');
             smallBtn.className = 'media-control-btn';
             smallBtn.textContent = 'S';
             smallBtn.dataset.action = 'resize-small';
+            smallBtn.title = 'Small size (25%)';
             
             const mediumBtn = document.createElement('button');
             mediumBtn.className = 'media-control-btn';
             mediumBtn.textContent = 'M';
             mediumBtn.dataset.action = 'resize-medium';
+            mediumBtn.title = 'Medium size (50%)';
             
             const largeBtn = document.createElement('button');
             largeBtn.className = 'media-control-btn';
             largeBtn.textContent = 'L';
             largeBtn.dataset.action = 'resize-large';
+            largeBtn.title = 'Large size (100%)';
             
-            // Alignment controls
             const leftBtn = document.createElement('button');
             leftBtn.className = 'media-control-btn';
             leftBtn.textContent = '◀';
             leftBtn.dataset.action = 'align-left';
+            leftBtn.title = 'Align left';
             
             const centerBtn = document.createElement('button');
             centerBtn.className = 'media-control-btn';
             centerBtn.textContent = '■';
             centerBtn.dataset.action = 'align-center';
+            centerBtn.title = 'Align center';
             
             const rightBtn = document.createElement('button');
             rightBtn.className = 'media-control-btn';
             rightBtn.textContent = '▶';
             rightBtn.dataset.action = 'align-right';
+            rightBtn.title = 'Align right';
             
-            // Delete, Edit, and Crop buttons
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'media-control-btn media-delete-btn';
             deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
             deleteBtn.dataset.action = 'delete';
+            deleteBtn.title = 'Delete';
             
             const editBtn = document.createElement('button');
             editBtn.className = 'media-control-btn media-edit-btn';
             editBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>';
             editBtn.dataset.action = 'edit';
+            editBtn.title = 'Edit';
             
             const cropBtn = document.createElement('button');
             cropBtn.className = 'media-control-btn media-crop-btn';
             cropBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>';
             cropBtn.dataset.action = 'crop';
+            cropBtn.title = 'Crop';
             
-            // Add all buttons to controls
             controls.appendChild(smallBtn);
             controls.appendChild(mediumBtn);
             controls.appendChild(largeBtn);
@@ -514,19 +541,21 @@ export const TextEditor = () => {
             range.deleteContents();
             range.insertNode(videoContainer);
             
-            // Setup event handlers for the new controls
+            videoContainer.classList.add('media-active');
+            setTimeout(() => {
+              videoContainer.classList.remove('media-active');
+            }, 2000);
+            
             const setupNewMediaControls = () => {
               videoContainer.addEventListener('click', function(e) {
                 if ((e.target as Element).closest('.media-controls')) return;
                 
                 const wasActive = videoContainer.classList.contains('media-active');
                 
-                // Remove active class from all media containers
                 document.querySelectorAll('.media-container').forEach(mc => {
                   mc.classList.remove('media-active');
                 });
                 
-                // If this container wasn't active before, make it active
                 if (!wasActive) {
                   videoContainer.classList.add('media-active');
                 }
@@ -578,10 +607,10 @@ export const TextEditor = () => {
               });
             };
             
-            // Call the setup function
             setupNewMediaControls();
             
-            // Move cursor after the video
+            toast.success(`Video added successfully!`);
+            
             range.setStartAfter(videoContainer);
             range.collapse(true);
             selection.removeAllRanges();
@@ -611,105 +640,105 @@ export const TextEditor = () => {
         const fileType = file.type;
         const fileSize = (file.size / 1024).toFixed(2) + ' KB';
         
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
+        toast.info(`Uploading file: ${fileName}...`);
+        
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const fileUrl = e.target?.result as string;
+          const selection = window.getSelection();
           
-          const attachment = document.createElement('div');
-          attachment.className = 'attachment animate-in';
-          
-          // Choose icon based on file type
-          let iconSvg = '';
-          
-          if (fileType.startsWith('image/')) {
-            iconSvg = `
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-            `;
-          } else if (fileType.startsWith('video/')) {
-            iconSvg = `
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="23 7 16 12 23 17 23 7"></polygon>
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-              </svg>
-            `;
-          } else if (fileType.startsWith('application/pdf')) {
-            iconSvg = `
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
-            `;
-          } else {
-            iconSvg = `
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                <polyline points="13 2 13 9 20 9"></polyline>
-              </svg>
-            `;
-          }
-          
-          const icon = document.createElement('span');
-          icon.className = 'attachment-icon';
-          icon.innerHTML = iconSvg;
-          
-          const nameSpan = document.createElement('span');
-          nameSpan.className = 'attachment-name';
-          nameSpan.textContent = fileName;
-          
-          const sizeSpan = document.createElement('span');
-          sizeSpan.className = 'attachment-size';
-          sizeSpan.textContent = fileSize;
-          
-          const previewButton = document.createElement('button');
-          previewButton.className = 'attachment-preview-btn';
-          previewButton.textContent = 'Preview';
-          
-          previewButton.addEventListener('click', (e) => {
-            e.preventDefault();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
             
-            // Create preview modal
-            const modal = document.createElement('div');
-            modal.className = 'attachment-preview-modal';
+            const attachment = document.createElement('div');
+            attachment.className = 'attachment animate-in';
             
-            const modalContent = document.createElement('div');
-            modalContent.className = 'attachment-preview-content';
+            let iconSvg = '';
             
-            const closeBtn = document.createElement('span');
-            closeBtn.className = 'attachment-preview-close';
-            closeBtn.innerHTML = '&times;';
-            closeBtn.addEventListener('click', () => {
-              document.body.removeChild(modal);
-            });
+            if (fileType.startsWith('image/')) {
+              iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              `;
+            } else if (fileType.startsWith('video/')) {
+              iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+              `;
+            } else if (fileType.startsWith('application/pdf')) {
+              iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+              `;
+            } else {
+              iconSvg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                  <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
+              `;
+            }
             
-            modalContent.appendChild(closeBtn);
+            const icon = document.createElement('span');
+            icon.className = 'attachment-icon';
+            icon.innerHTML = iconSvg;
             
-            // Display content based on file type
-            const reader = new FileReader();
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'attachment-name';
+            nameSpan.textContent = fileName;
             
-            reader.onload = function(event) {
-              const result = event.target?.result;
+            const sizeSpan = document.createElement('span');
+            sizeSpan.className = 'attachment-size';
+            sizeSpan.textContent = fileSize;
+            
+            const previewButton = document.createElement('button');
+            previewButton.className = 'attachment-preview-btn';
+            previewButton.textContent = 'Preview';
+            
+            previewButton.addEventListener('click', (e) => {
+              e.preventDefault();
+              
+              const modal = document.createElement('div');
+              modal.className = 'attachment-preview-modal';
+              
+              const modalContent = document.createElement('div');
+              modalContent.className = 'attachment-preview-content';
+              
+              const closeBtn = document.createElement('span');
+              closeBtn.className = 'attachment-preview-close';
+              closeBtn.innerHTML = '&times;';
+              closeBtn.addEventListener('click', () => {
+                document.body.removeChild(modal);
+              });
+              
+              modalContent.appendChild(closeBtn);
               
               if (fileType.startsWith('image/')) {
                 const img = document.createElement('img');
-                img.src = result as string;
+                img.src = fileUrl;
                 img.className = 'attachment-preview-image';
                 modalContent.appendChild(img);
               } else if (fileType.startsWith('video/')) {
                 const video = document.createElement('video');
-                video.src = result as string;
+                video.src = fileUrl;
                 video.controls = true;
+                video.autoplay = false;
                 video.className = 'attachment-preview-video';
                 modalContent.appendChild(video);
               } else if (fileType.startsWith('application/pdf')) {
                 const embed = document.createElement('embed');
-                embed.src = result as string;
+                embed.src = fileUrl;
                 embed.type = 'application/pdf';
                 embed.className = 'attachment-preview-pdf';
                 modalContent.appendChild(embed);
@@ -719,22 +748,42 @@ export const TextEditor = () => {
                 message.textContent = `Preview not available for ${fileName}`;
                 modalContent.appendChild(message);
               }
-            };
+              
+              modal.appendChild(modalContent);
+              document.body.appendChild(modal);
+            });
             
-            reader.readAsDataURL(file);
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'attachment-delete-btn';
+            deleteButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>';
+            deleteButton.title = 'Delete';
             
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-          });
-          
-          attachment.appendChild(icon);
-          attachment.appendChild(nameSpan);
-          attachment.appendChild(sizeSpan);
-          attachment.appendChild(previewButton);
-          
-          range.deleteContents();
-          range.insertNode(attachment);
-        }
+            deleteButton.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (confirm('Are you sure you want to delete this attachment?')) {
+                attachment.remove();
+              }
+            });
+            
+            attachment.appendChild(icon);
+            attachment.appendChild(nameSpan);
+            attachment.appendChild(sizeSpan);
+            attachment.appendChild(previewButton);
+            attachment.appendChild(deleteButton);
+            
+            range.deleteContents();
+            range.insertNode(attachment);
+            
+            toast.success(`File attached successfully!`);
+            
+            range.setStartAfter(attachment);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        };
+        
+        reader.readAsDataURL(file);
       }
       
       document.body.removeChild(fileInput);

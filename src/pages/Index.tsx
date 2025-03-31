@@ -1,6 +1,7 @@
 
 import { TextEditor } from '../components/TextEditor/TextEditor';
 import { useIsMobile } from '../hooks/use-mobile';
+import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -17,6 +18,7 @@ const Index = () => {
         </p>
         <TextEditor />
       </main>
+      <Toaster />
     </div>
   );
 };
