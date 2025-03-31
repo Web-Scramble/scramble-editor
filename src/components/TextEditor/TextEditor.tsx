@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Toolbar } from './Toolbar';
 import { ContentArea } from './ContentArea';
 import './TextEditor.css';
-import { GripVertical, Minimize, Plus } from 'lucide-react';
+import { GripVertical, Minimize, Plus, Image, Video, File } from 'lucide-react';
 import { useIsMobile } from '../../hooks/use-mobile';
 
 export const TextEditor = () => {
@@ -239,6 +239,102 @@ export const TextEditor = () => {
     }
   };
 
+  const handleImageUpload = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+    
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const imageUrl = e.target?.result as string;
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'media-container image-container animate-in';
+            
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = file.name;
+            img.className = 'editor-image';
+            
+            imgContainer.appendChild(img);
+            
+            range.deleteContents();
+            range.insertNode(imgContainer);
+            
+            // Move cursor after the image
+            range.setStartAfter(imgContainer);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        };
+        
+        reader.readAsDataURL(file);
+      }
+      
+      document.body.removeChild(fileInput);
+    });
+    
+    fileInput.click();
+  };
+
+  const handleVideoUpload = () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'video/*';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+    
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          const videoUrl = e.target?.result as string;
+          const selection = window.getSelection();
+          if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            
+            const videoContainer = document.createElement('div');
+            videoContainer.className = 'media-container video-container animate-in';
+            
+            const video = document.createElement('video');
+            video.src = videoUrl;
+            video.controls = true;
+            video.className = 'editor-video';
+            
+            videoContainer.appendChild(video);
+            
+            range.deleteContents();
+            range.insertNode(videoContainer);
+            
+            // Move cursor after the video
+            range.setStartAfter(videoContainer);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        };
+        
+        reader.readAsDataURL(file);
+      }
+      
+      document.body.removeChild(fileInput);
+    });
+    
+    fileInput.click();
+  };
+
   const handleAttachment = () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -247,26 +343,131 @@ export const TextEditor = () => {
     
     fileInput.addEventListener('change', function() {
       if (this.files && this.files[0]) {
-        const fileName = this.files[0].name;
+        const file = this.files[0];
+        const fileName = file.name;
+        const fileType = file.type;
+        const fileSize = (file.size / 1024).toFixed(2) + ' KB';
+        
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
           const range = selection.getRangeAt(0);
+          
           const attachment = document.createElement('div');
           attachment.className = 'attachment animate-in';
           
+          // Choose icon based on file type
+          let iconSvg = '';
+          
+          if (fileType.startsWith('image/')) {
+            iconSvg = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            `;
+          } else if (fileType.startsWith('video/')) {
+            iconSvg = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+              </svg>
+            `;
+          } else if (fileType.startsWith('application/pdf')) {
+            iconSvg = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            `;
+          } else {
+            iconSvg = `
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                <polyline points="13 2 13 9 20 9"></polyline>
+              </svg>
+            `;
+          }
+          
           const icon = document.createElement('span');
-          icon.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-              <polyline points="13 2 13 9 20 9"></polyline>
-            </svg>
-          `;
+          icon.className = 'attachment-icon';
+          icon.innerHTML = iconSvg;
           
           const nameSpan = document.createElement('span');
+          nameSpan.className = 'attachment-name';
           nameSpan.textContent = fileName;
+          
+          const sizeSpan = document.createElement('span');
+          sizeSpan.className = 'attachment-size';
+          sizeSpan.textContent = fileSize;
+          
+          const previewButton = document.createElement('button');
+          previewButton.className = 'attachment-preview-btn';
+          previewButton.textContent = 'Preview';
+          
+          previewButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Create preview modal
+            const modal = document.createElement('div');
+            modal.className = 'attachment-preview-modal';
+            
+            const modalContent = document.createElement('div');
+            modalContent.className = 'attachment-preview-content';
+            
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'attachment-preview-close';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.addEventListener('click', () => {
+              document.body.removeChild(modal);
+            });
+            
+            modalContent.appendChild(closeBtn);
+            
+            // Display content based on file type
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+              const result = event.target?.result;
+              
+              if (fileType.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = result as string;
+                img.className = 'attachment-preview-image';
+                modalContent.appendChild(img);
+              } else if (fileType.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.src = result as string;
+                video.controls = true;
+                video.className = 'attachment-preview-video';
+                modalContent.appendChild(video);
+              } else if (fileType.startsWith('application/pdf')) {
+                const embed = document.createElement('embed');
+                embed.src = result as string;
+                embed.type = 'application/pdf';
+                embed.className = 'attachment-preview-pdf';
+                modalContent.appendChild(embed);
+              } else {
+                const message = document.createElement('div');
+                message.className = 'attachment-preview-message';
+                message.textContent = `Preview not available for ${fileName}`;
+                modalContent.appendChild(message);
+              }
+            };
+            
+            reader.readAsDataURL(file);
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+          });
           
           attachment.appendChild(icon);
           attachment.appendChild(nameSpan);
+          attachment.appendChild(sizeSpan);
+          attachment.appendChild(previewButton);
           
           range.deleteContents();
           range.insertNode(attachment);
@@ -397,6 +598,8 @@ export const TextEditor = () => {
             insertCodeBlock={insertCodeBlock}
             insertEquation={insertEquation}
             handleAttachment={handleAttachment}
+            handleImageUpload={handleImageUpload}
+            handleVideoUpload={handleVideoUpload}
             insertDivider={insertDivider}
             onParagraphStyle={handleParagraphStyle}
             onTextStyle={handleTextStyle}

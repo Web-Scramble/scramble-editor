@@ -4,7 +4,7 @@ import {
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
   Code, Link2, List, ListOrdered, Table, Paperclip,
-  Smile, Undo, Redo, ChevronDown
+  Smile, Undo, Redo, ChevronDown, Image, Video, File
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { NumberInput } from './NumberInput';
@@ -31,6 +31,8 @@ interface ToolbarProps {
   insertCodeBlock: () => void;
   insertEquation: () => void;
   handleAttachment: () => void;
+  handleImageUpload: () => void;
+  handleVideoUpload: () => void;
   insertDivider: () => void;
   onParagraphStyle: (command: string) => void;
   onTextStyle: (command: string) => void;
@@ -49,6 +51,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   insertCodeBlock,
   insertEquation,
   handleAttachment,
+  handleImageUpload,
+  handleVideoUpload,
   insertDivider,
   onParagraphStyle,
   onTextStyle,
@@ -180,8 +184,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         </button>
       </div>
 
-      {/* Tables and Attachments */}
+      {/* Media and Attachments */}
       <div className={`toolbar-group ${isGroupActive('insert') ? 'active' : ''}`}>
+        <button className="btn" title="Insert Image" onClick={handleImageUpload}>
+          <Image size={16} />
+        </button>
+        <button className="btn" title="Insert Video" onClick={handleVideoUpload}>
+          <Video size={16} />
+        </button>
         <button className="btn" title="Insert Table" onClick={(e) => {
           const html = '<table style="width:100%; border-collapse: collapse;"><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr><tr><td style="border: 1px solid #ccc; padding: 8px;"></td><td style="border: 1px solid #ccc; padding: 8px;"></td></tr></table><p></p>';
           execCommand('insertHTML', false, html);
