@@ -888,3 +888,44 @@
     height: 28px;
   }
 }
+
+/* Media drag and drop styles */
+.drop-zone.drag-over {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px dashed #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Add responsive cursor styles for editing */
+.crop-overlay {
+  cursor: move;
+}
+
+.resize-handle-nw {
+  cursor: nwse-resize;
+}
+
+.resize-handle-ne {
+  cursor: nesw-resize;
+}
+
+.resize-handle-sw {
+  cursor: nesw-resize;
+}
+
+.resize-handle-se {
+  cursor: nwse-resize;
+}
+
+/* Media content hover styling for resize indication */
+.media-content {
+  position: relative;
+}
+
+.media-content:hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
