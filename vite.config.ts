@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -17,4 +17,4 @@ export default defineConfig({
       "@": resolve(__dirname, "./src"),
     },
   },
-});
+}));

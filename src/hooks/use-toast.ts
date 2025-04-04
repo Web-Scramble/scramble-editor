@@ -59,4 +59,8 @@ export function useToast() {
   };
 }
 
-export { toast };
+// Export a named toast function for convenience
+export const toast = (props: ToastActionProps) => {
+  const { toast: toastFn } = useToast();
+  return toastFn(props);
+};
