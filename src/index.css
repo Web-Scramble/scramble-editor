@@ -1,80 +1,101 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.ProseMirror {
-  @apply min-h-[200px] p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500;
-}
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-.ProseMirror p.is-editor-empty:first-child::before {
-  @apply text-gray-400 float-left h-0 pointer-events-none;
-  content: attr(data-placeholder);
-}
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
-.floating-menu {
-  @apply bg-white shadow-lg rounded-md p-1 flex gap-1 border border-gray-200;
-}
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-.bubble-menu {
-  @apply bg-white shadow-lg rounded-md p-1 flex gap-1 border border-gray-200;
-}
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
 
-.toolbar-button {
-  @apply p-1.5 rounded hover:bg-gray-100 transition-colors;
-}
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-.toolbar-button.active {
-  @apply bg-gray-200;
-}
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-.code-block {
-  @apply bg-gray-100 p-3 rounded-md font-mono text-sm my-2;
-}
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-.media-element {
-  @apply relative my-4 group;
-}
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-.media-element.media-align-left {
-  @apply float-left mr-4;
-}
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
 
-.media-element.media-align-center {
-  @apply mx-auto text-center;
-}
+    --radius: 0.5rem;
 
-.media-element.media-align-right {
-  @apply float-right ml-4;
-}
+    --sidebar-background: 0 0% 98%;
 
-.media-toolbar {
-  @apply absolute top-2 right-2 bg-white/80 rounded-md shadow-sm backdrop-blur-sm flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10;
-}
+    --sidebar-foreground: 240 5.3% 26.1%;
 
-.media-content {
-  @apply relative overflow-hidden;
-}
+    --sidebar-primary: 240 5.9% 10%;
 
-.media-caption {
-  @apply text-sm text-gray-600 mt-1 text-center;
-}
+    --sidebar-primary-foreground: 0 0% 98%;
 
-.media-edit-panel {
-  @apply absolute inset-0 bg-black/50 z-20 flex flex-col items-center justify-center;
-}
+    --sidebar-accent: 240 4.8% 95.9%;
 
-.animate-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
+    --sidebar-accent-foreground: 240 5.9% 10%;
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
   }
 }
