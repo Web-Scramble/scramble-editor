@@ -1,6 +1,5 @@
 
 import { useState } from 'react'
-import ScrambleEditor from './components/ScrambleEditor'
 import './App.css'
 
 function App() {
@@ -13,13 +12,10 @@ function App() {
       
       <div className="border rounded-lg p-4 bg-white shadow-md">
         <h2 className="text-2xl font-bold mb-4">Untitled</h2>
-        <ScrambleEditor 
-          initialValue={content}
-          onChange={setContent}
-          placeholder="Start typing here..."
-          height="auto"
-          editorClassName="min-h-[300px]"
-          floatingToolbar={true}
+        <div className="min-h-[300px] p-4 focus:outline-none" 
+             contentEditable
+             dangerouslySetInnerHTML={{ __html: content }}
+             onInput={(e) => setContent(e.currentTarget.innerHTML)}
         />
       </div>
       
