@@ -1,21 +1,22 @@
 
-import { useState } from 'react'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [content, setContent] = useState('<p>Start typing here...</p>')
+  const [content, setContent] = useState('<p>Start typing here...</p>');
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Floating Rich Text Editor</h1>
-      <p className="mb-4">The toolbar can be moved around by dragging the handle and minimized with the icon in the top-right corner.</p>
+      <p className="mb-4">This is a simplified version of the editor.</p>
       
       <div className="border rounded-lg p-4 bg-white shadow-md">
         <h2 className="text-2xl font-bold mb-4">Untitled</h2>
-        <div className="min-h-[300px] p-4 focus:outline-none" 
-             contentEditable
-             dangerouslySetInnerHTML={{ __html: content }}
-             onInput={(e) => setContent(e.currentTarget.innerHTML)}
+        <div 
+          className="min-h-[300px] p-4 focus:outline-none border rounded" 
+          contentEditable
+          dangerouslySetInnerHTML={{ __html: content }}
+          onInput={(e) => setContent(e.currentTarget.innerHTML)}
         />
       </div>
       
@@ -26,7 +27,7 @@ function App() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
