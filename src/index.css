@@ -3,17 +3,17 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-gray-50 text-gray-900;
+.ProseMirror {
+  @apply min-h-[200px] p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500;
 }
 
-.editor-content-wrapper {
-  min-height: 200px;
-  position: relative;
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-gray-400 float-left h-0 pointer-events-none;
+  content: attr(data-placeholder);
 }
 
-.drag-over {
-  @apply border-2 border-dashed border-blue-400 bg-blue-50;
+.floating-menu {
+  @apply bg-white shadow-lg rounded-md p-1 flex gap-1 border border-gray-200;
 }
 
 .bubble-menu {
@@ -26,4 +26,55 @@ body {
 
 .toolbar-button.active {
   @apply bg-gray-200;
+}
+
+.code-block {
+  @apply bg-gray-100 p-3 rounded-md font-mono text-sm my-2;
+}
+
+.media-element {
+  @apply relative my-4 group;
+}
+
+.media-element.media-align-left {
+  @apply float-left mr-4;
+}
+
+.media-element.media-align-center {
+  @apply mx-auto text-center;
+}
+
+.media-element.media-align-right {
+  @apply float-right ml-4;
+}
+
+.media-toolbar {
+  @apply absolute top-2 right-2 bg-white/80 rounded-md shadow-sm backdrop-blur-sm flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10;
+}
+
+.media-content {
+  @apply relative overflow-hidden;
+}
+
+.media-caption {
+  @apply text-sm text-gray-600 mt-1 text-center;
+}
+
+.media-edit-panel {
+  @apply absolute inset-0 bg-black/50 z-20 flex flex-col items-center justify-center;
+}
+
+.animate-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
