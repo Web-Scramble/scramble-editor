@@ -239,7 +239,55 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       range.deleteContents();
       range.insertNode(codeBlock);
       
+      // Add a paragraph after the code block if it's at the end
+      if (!codeBlock.nextSibling) {
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        codeBlock.parentNode?.appendChild(p);
+      }
+      
       selection.removeAllRanges();
+      
+      toast({
+        title: "Code Block Added",
+        description: "A code block has been inserted into your document.",
+      });
+    }
+  };
+
+  const insertInlineCode = () => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      const selectedText = range.toString();
+      
+      if (selectedText) {
+        // If there's selected text, wrap it in inline code
+        const codeElement = document.createElement('code');
+        codeElement.className = 'inline-code';
+        codeElement.textContent = selectedText;
+        
+        range.deleteContents();
+        range.insertNode(codeElement);
+      } else {
+        // If no selection, insert a placeholder inline code
+        const codeElement = document.createElement('code');
+        codeElement.className = 'inline-code';
+        codeElement.textContent = 'code';
+        
+        range.insertNode(codeElement);
+        
+        // Select the placeholder text to make it easy to replace
+        const newRange = document.createRange();
+        newRange.selectNodeContents(codeElement);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+      }
+      
+      toast({
+        title: "Inline Code Added",
+        description: "Inline code has been added to your document.",
+      });
     }
   };
 
@@ -584,6 +632,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               onEmojiSelect={handleEmojiSelect}
               toggleDropdown={toggleDropdown}
               insertCodeBlock={insertCodeBlock}
+              insertInlineCode={insertInlineCode}
               insertEquation={insertEquation}
               handleAttachment={handleAttachment}
               insertDivider={insertDivider}
@@ -605,6 +654,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             onEmojiSelect={handleEmojiSelect}
             toggleDropdown={toggleDropdown}
             insertCodeBlock={insertCodeBlock}
+            insertInlineCode={insertInlineCode}
             insertEquation={insertEquation}
             handleAttachment={handleAttachment}
             insertDivider={insertDivider}

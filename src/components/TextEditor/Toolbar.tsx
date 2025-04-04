@@ -4,7 +4,7 @@ import {
   Bold, Italic, Underline, Strikethrough, 
   AlignLeft, AlignCenter, AlignRight, AlignJustify, 
   Code, Link2, List, ListOrdered, Table, Paperclip,
-  Smile, Undo, Redo, ChevronDown
+  Smile, Undo, Redo, ChevronDown, CodeSquare
 } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { NumberInput } from './NumberInput';
@@ -22,13 +22,15 @@ interface ToolbarProps {
     showEmojiPicker: boolean;
     showParagraphStyleMenu: boolean;
     showTextStyleMenu: boolean;
+    showMediaUploadMenu: boolean;
   };
   onColorChange: (color: string) => void;
   onHighlightChange: (color: string) => void;
   onFontSizeChange: (size: number) => void;
   onEmojiSelect: (emoji: string) => void;
-  toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle' | 'textStyle', e: React.MouseEvent) => void;
+  toggleDropdown: (dropdown: 'color' | 'highlight' | 'fontSize' | 'emoji' | 'paragraphStyle' | 'textStyle' | 'mediaUpload', e: React.MouseEvent) => void;
   insertCodeBlock: () => void;
+  insertInlineCode: () => void;
   insertEquation: () => void;
   handleAttachment: () => void;
   insertDivider: () => void;
@@ -47,6 +49,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onEmojiSelect,
   toggleDropdown,
   insertCodeBlock,
+  insertInlineCode,
   insertEquation,
   handleAttachment,
   insertDivider,
@@ -254,8 +257,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
       {/* Special Format Options */}
       <div className={`toolbar-group ${isGroupActive('insert') ? 'active' : ''}`}>
-        <button className="btn" title="Add Code Block" onClick={insertCodeBlock}>
+        <button className="btn" title="Add Inline Code" onClick={insertInlineCode}>
           <Code size={16} />
+        </button>
+        <button className="btn" title="Add Code Block" onClick={insertCodeBlock}>
+          <CodeSquare size={16} />
         </button>
         <button className="btn" title="Insert Equation" onClick={insertEquation}>
           <span className="math-icon">∫</span>
