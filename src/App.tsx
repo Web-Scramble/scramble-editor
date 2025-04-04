@@ -7,16 +7,17 @@ function App() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">Floating Rich Text Editor</h1>
-      <p className="mb-4">This is a simplified version of the editor.</p>
+      <h1 className="text-3xl font-bold mb-4">Simple Rich Text Editor</h1>
+      <p className="mb-4">This is a basic editor while we fix the dependencies.</p>
       
       <div className="border rounded-lg p-4 bg-white shadow-md">
         <h2 className="text-2xl font-bold mb-4">Untitled</h2>
         <div 
-          className="min-h-[300px] p-4 focus:outline-none border rounded" 
+          className="min-h-[300px] p-4 focus:outline-none border rounded ProseMirror" 
           contentEditable
           dangerouslySetInnerHTML={{ __html: content }}
           onInput={(e) => setContent(e.currentTarget.innerHTML)}
+          data-placeholder="Start typing here..."
         />
       </div>
       
